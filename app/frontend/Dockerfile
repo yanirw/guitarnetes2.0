@@ -3,5 +3,5 @@ WORKDIR /app
 COPY ../requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY frontend.py /app
-EXPOSE 5001
+EXPOSE 3000
 CMD ["python", "frontend.py"]
