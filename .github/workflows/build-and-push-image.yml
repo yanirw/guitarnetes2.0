@@ -36,16 +36,16 @@ jobs:
       - name: Build and push Echo Server Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./app/echo_server
-          file: ./app/echo_server/Dockerfile
+          context: ./app
+          file: ./echo_server/Dockerfile
           push: ${{ github.event_name == 'workflow_dispatch' }}
           tags: ${{ env.REGISTRY }}/echo-server:${{ github.event.inputs.docker_tag }}
 
       - name: Build and push Frontend Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./app/frontend
-          file: ./app/frontend/Dockerfile
+          context: ./app
+          file: ./frontend/Dockerfile
           push: ${{ github.event_name == 'workflow_dispatch' }}
           tags: ${{ env.REGISTRY }}/frontend:${{ github.event.inputs.docker_tag }}
 
