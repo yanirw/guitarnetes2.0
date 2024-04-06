@@ -39,7 +39,7 @@ jobs:
           context: ./app
           file: ./app/echo_server/Dockerfile
           push: ${{ github.event_name == 'workflow_dispatch' }}
-          tags: ${{ env.REGISTRY }}/echo-server:${{ github.event.inputs.docker_tag }}
+          tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/echo-server:${{ github.event.inputs.docker_tag }}
 
       - name: Build and push Frontend Docker image
         uses: docker/build-push-action@v5
@@ -47,5 +47,5 @@ jobs:
           context: ./app
           file: ./app/frontend/Dockerfile
           push: ${{ github.event_name == 'workflow_dispatch' }}
-          tags: ${{ env.REGISTRY }}/frontend:${{ github.event.inputs.docker_tag }}
+          tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/frontend:${{ github.event.inputs.docker_tag }}
 
