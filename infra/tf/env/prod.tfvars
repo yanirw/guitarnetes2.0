@@ -1,5 +1,5 @@
-gcp_project_name = "guitarnetes1"
-project_id = "guitarnetes1"
+gcp_project_name = "guitarnetes-1"
+project_id = "guitarnetes-1"
 region = "us-east1"
 vpc_name = "gke-vpc-1"
 subnet_name = "private-subnet"
