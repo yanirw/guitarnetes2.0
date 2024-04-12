@@ -2,24 +2,21 @@
 Expand the name of the chart.
 */}}
 {{- define "echo_server.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
+If the release name contains the chart name it will be used as a full name.
 */}}
 {{- define "echo_server.fullname" -}}
 {{- if .Values.fullnameOverride }}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
 {{- else }}
 {{- $name := default .Chart.Name .Values.nameOverride }}
-{{- if contains $name .Release.Name }}
-{{- .Release.Name | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
-{{- end }}
+{{- $name = printf "%s-%s" .Release.Name $name | replace "_" "-" | lower }}
+{{- $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 {{- end }}
 
@@ -27,7 +24,7 @@ If release name contains chart name it will be used as a full name.
 Create chart name and version as used by the chart label.
 */}}
 {{- define "echo_server.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
 {{- end }}
 
 {{/*
@@ -39,7 +36,7 @@ helm.sh/chart: {{ include "echo_server.chart" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | lower }}
 {{- end }}
 
 {{/*
@@ -47,16 +44,16 @@ Selector labels
 */}}
 {{- define "echo_server.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "echo_server.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ .Release.Name | lower | replace "_" "-" }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
 {{- define "echo_server.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "echo_server.fullname" .) .Values.serviceAccount.name }}
+{{- if .Values.echo_server.serviceAccount.create }}
+{{- default (include "echo_server.fullname" .) .Values.echo_server.serviceAccount.name | replace "_" "-" | lower }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- default "default" .Values.echo_server.serviceAccount.name | replace "_" "-" | lower }}
 {{- end }}
 {{- end }}
