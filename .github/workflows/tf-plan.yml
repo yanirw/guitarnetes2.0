@@ -2,9 +2,12 @@ name: Terraform Plan
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'infra/tf/**'  
   pull_request:
     paths:
-      - 'tf/**'
+      - 'infra/tf/**'
 
 jobs:
   terraform:

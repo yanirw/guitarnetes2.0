@@ -1,0 +1,13 @@
+# Ignore Terraform state files and backups in the infra/tf directory
+infra/tf/*.tfstate
+infra/tf/*.tfstate.*
+infra/tf/*.backup
+infra/tf/*.bak
+
+infra/tf/*.tfplan
+
+# Ignore Terraform cache directories in the infra/tf directory
+infra/tf/**.terraform
+
+# Ignore Terraform state files within the .backup directory in the infra/tf directory
+infra/tf/.backup/*.tfstate.*
