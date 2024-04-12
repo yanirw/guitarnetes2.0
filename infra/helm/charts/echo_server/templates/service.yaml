@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "echo_server.fullname" . }}
+  labels:
+    {{- include "echo_server.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.echo-server.service.type }}
+  ports:
+    - port: {{ .Values.echo-server.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "echo_server.selectorLabels" . | nindent 4 }}

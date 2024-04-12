@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "echo_server.fullname" . }}
+  labels:
+    {{- include "echo_server.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.echo-server.autoscaling.enabled }}
+  replicas: {{ .Values.echo-server.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "echo_server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.echo-server.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "echo_server.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.echo-server.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "echo_server.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.echo-server.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.echo-server.securityContext | nindent 12 }}
+          image: "{{ .Values.echo-server.image.repository }}:{{ .Values.echo-server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.echo-server.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.echo-server.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.echo-server.resources | nindent 12 }}
+      {{- with .Values.echo-server.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.echo-server.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.echo-server.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
