@@ -1,7 +1,8 @@
 FROM python:3.9-slim
 WORKDIR /app
-COPY ../requirements.txt requirements.txt
+COPY ../requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY ./frontend/frontend.py /app
+COPY frontend/frontend.py .
 EXPOSE 3000
+
 CMD ["python", "frontend.py"]

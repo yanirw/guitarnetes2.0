@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "echo_server.fullname" . }}
+  name: {{ .Values.echo_server.name }}
   labels:
     {{- include "echo_server.labels" . | nindent 4 }}
 spec:
