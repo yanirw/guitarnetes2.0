@@ -5,7 +5,7 @@ echo_server:
   image:
     repository: ghcr.io/yanirw/echo-server
     pullPolicy: IfNotPresent
-    tag: "1.0"
+    tag: "2.0"
 
   imagePullSecrets: []
   nameOverride: ""
@@ -55,7 +55,7 @@ frontend:
   image:
     repository: ghcr.io/yanirw/frontend
     pullPolicy: IfNotPresent
-    tag: "1.0"
+    tag: "2.0"
 
   imagePullSecrets: []
   nameOverride: ""
