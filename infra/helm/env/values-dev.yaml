@@ -1,4 +1,5 @@
 echo_server:
+  name: echo-server
   replicaCount: 1
 
   image:
@@ -48,6 +49,7 @@ echo_server:
   affinity: {}
 
 frontend:
+  name: frontend
   replicaCount: 1
 
   image:
