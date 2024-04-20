@@ -1,18 +1,22 @@
 name: build and push images to github package
 
 on:
+  push:
+    paths:
+      - 'app/**'
   pull_request:
-    branches: [main]
+    branches:
+      - main
+    paths:
+      - 'app/**'
+    types: [closed]  
   workflow_dispatch:
-    inputs:
-      docker_tag:
-        description: 'Docker tag'
-        required: true
-        default: 'latest'
-        type: string
+  
+
 
 env:
   REGISTRY: ghcr.io
+
 
 jobs:
   build-and-push:
@@ -20,13 +24,32 @@ jobs:
     permissions:
       contents: read
       packages: write
-
+  
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Set up Path Filter
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            echo_server:
+              - 'app/echo_server/**'
+            frontend:
+              - 'app/frontend/**'
+
+      - name: Read Echo Server Version
+        if: steps.changes.outputs.echo_server == 'true'
+        id: echo_version
+        run: echo "ECHO_VERSION=$(cat app/echo_server/version.txt)" >> $GITHUB_ENV
+
+      - name: Read Frontend Version
+        if: steps.changes.outputs.frontend == 'true'
+        id: frontend_version
+        run: echo "FRONTEND_VERSION=$(cat app/frontend/version.txt)" >> $GITHUB_ENV
 
       - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name == 'workflow_dispatch'
         uses: docker/login-action@v1
         with:
           registry: ${{ env.REGISTRY }}
@@ -34,18 +57,31 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Echo Server Docker image
+        if: steps.changes.outputs.echo_server == 'true'
         uses: docker/build-push-action@v5
         with:
-          context: ./app
+          context: ./app/echo_server
           file: ./app/echo_server/Dockerfile
-          push: ${{ github.event_name == 'workflow_dispatch' }}
-          tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/echo-server:${{ github.event.inputs.docker_tag }}
+          push: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.pull_request.merged == true) }}
+          tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/echo-server:${{ env.ECHO_VERSION }}
 
       - name: Build and push Frontend Docker image
+        if: steps.changes.outputs.frontend == 'true'
         uses: docker/build-push-action@v5
         with:
-          context: ./app
+          context: ./app/frontend
           file: ./app/frontend/Dockerfile
-          push: ${{ github.event_name == 'workflow_dispatch' }}
-          tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/frontend:${{ github.event.inputs.docker_tag }}
+          push: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.pull_request.merged == true) }}
+          tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/frontend:${{ env.FRONTEND_VERSION }}
 
+      - name: Create GitHub Release
+        if: github.event_name == 'push' && github.event.pull_request.merged == true
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.ECHO_VERSION }}
+          release_name: Project Release ${{ env.ECHO_VERSION }}
+          body: "New project release ${env.ECHO_VERSION}."
+          draft: false
+          prerelease: false
