@@ -48,6 +48,16 @@ echo_server:
 
   affinity: {}
 
+  ingress:
+    enabled: true
+    className: ""  # Specify if needed
+    annotations:
+      # Add specific annotations if required
+    host: "echo-server.local"
+    servicePort: 5000
+    tls: []
+
+
 frontend:
   name: frontend
   replicaCount: 1
@@ -98,25 +108,14 @@ frontend:
   tolerations: []
 
   affinity: {}
+  ingress:
+    enabled: true
+    className: ""  # Specify if needed
+    annotations:
+      # Add specific annotations if required
+    host: "frontend.local"
+    servicePort: 3000
+    tls: []
 
 
-ingress:
-  enabled: true
-  className: ""
-  annotations:
-    # "kubernetes.io/ingress.class": "nginx"
-    # "kubernetes.io/tls-acme": "true"
-  hosts:
-    - host: "frontend.local"
-      paths:
-        - path: /(/|$)(.*)
-          pathType: Prefix
-          serviceName: frontend
-          servicePort: 3000
-    - host: "echo-server.local"
-      paths:
-        - path: /echo(/|$)(.*)
-          pathType: Prefix
-          serviceName: echo_server
-          servicePort: 5000
-  tls: []  # TLS settings array, populate if necessary
+
