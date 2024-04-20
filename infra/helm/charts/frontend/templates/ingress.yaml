@@ -6,11 +6,11 @@ metadata:
   labels:
     {{- include "frontend.labels" . | nindent 4 }}
   annotations:
-    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- toYaml .Values.frontend.ingress.annotations | nindent 4 }}
 spec:
-  ingressClassName: {{ .Values.ingress.className }}
+  ingressClassName: {{ .Values.frontend.ingress.className }}
   rules:
-  - host: {{ .Values.ingress.host }}
+  - host: {{ .Values.frontend.ingress.host }}
     http:
       paths:
       - path: /
@@ -19,11 +19,11 @@ spec:
           service:
             name: {{ include "frontend.fullname" . }}
             port:
-              number: {{ .Values.ingress.servicePort }}
-  {{- if .Values.ingress.tls }}
+              number: {{ .Values.frontend.service.port }}
+  {{- if .Values.frontend.ingress.tls }}
   tls:
     - hosts:
-        - {{ .Values.ingress.host }}
-      secretName: {{ .Values.ingress.tls.secretName }}
+        - {{ .Values.frontend.ingress.host }}
+      secretName: {{ .Values.frontend.ingress.tls.secretName }}
   {{- end }}
 {{- end }}
