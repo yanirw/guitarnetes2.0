@@ -28,7 +28,7 @@ spec:
       securityContext:
         {{- toYaml .Values.echo_server.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Values.echo_server.name }}
           securityContext:
             {{- toYaml .Values.echo_server.securityContext | nindent 12 }}
           image: "{{ .Values.echo_server.image.repository }}:{{ .Values.echo_server.image.tag | default .Chart.AppVersion }}"
