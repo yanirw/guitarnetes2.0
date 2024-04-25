@@ -74,14 +74,3 @@ jobs:
           push: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.pull_request.merged == true) }}
           tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/frontend:${{ env.FRONTEND_VERSION }}
 
-      - name: Create GitHub Release
-        if: github.event_name == 'push' && github.event.pull_request.merged == true
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.ECHO_VERSION }}
-          release_name: Project Release ${{ env.ECHO_VERSION }}
-          body: "New project release ${env.ECHO_VERSION}."
-          draft: false
-          prerelease: false
