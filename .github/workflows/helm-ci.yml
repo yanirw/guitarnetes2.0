@@ -44,11 +44,10 @@ jobs:
         for chart in ./infra/helm/charts/*; do
           if [ -d "$chart" ] && [ -e "$chart/Chart.yaml" ]; then
             chart_name=$(basename $chart)
-            release_name=$(echo "$chart_name" | tr '_' '-' | tr '[:upper:]' '[:lower:]')
-            echo "Templating $release_name..."
-            helm template "$release_name" $chart -f ./infra/helm/env/values-dev.yaml
+            echo "Templating $chart_name..."
+            helm template "$chart_name" $chart -f ./infra/helm/env/values-dev.yaml
             if [ $? -ne 0 ]; then
-              echo "Error in Helm template for $release_name"
+              echo "Error in Helm template for $chart_name"
               exit 1
             fi
           else
