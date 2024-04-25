@@ -1,0 +1,121 @@
+echo_server:
+  name: echo-server
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/yanirw/echo-server
+    pullPolicy: IfNotPresent
+    tag: "3.0.0"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 5000
+
+  resources: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 60
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  ingress:
+    enabled: true
+    className: ""  # Specify if needed
+    annotations:
+      # Add specific annotations if required
+    host: "echo-server.local"
+    servicePort: 5000
+    tls: []
+
+
+frontend:
+  name: frontend
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/yanirw/frontend
+    pullPolicy: IfNotPresent
+    tag: "3.0.1"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 3000
+
+
+  resources: {}
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 60
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+  ingress:
+    enabled: true
+    className: ""  # Specify if needed
+    annotations:
+      # Add specific annotations if required
+    host: "frontend.local"
+    servicePort: 3000
+    tls: []
+
+
+
