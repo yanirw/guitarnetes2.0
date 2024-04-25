@@ -6,11 +6,11 @@ metadata:
   labels:
     {{- include "echo_server.labels" . | nindent 4 }}
   annotations:
-    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- toYaml .Values.echo_server.ingress.annotations | nindent 4 }}
 spec:
-  ingressClassName: {{ .Values.ingress.className }}
+  ingressClassName: {{ .Values.echo_server.ingress.className }}
   rules:
-  - host: {{ .Values.ingress.host }}
+  - host: {{ .Values.echo_server.ingress.host }}
     http:
       paths:
       - path: /echo
@@ -19,11 +19,11 @@ spec:
           service:
             name: {{ include "echo_server.fullname" . }}
             port:
-              number: {{ .Values.ingress.servicePort }}
-  {{- if .Values.ingress.tls }}
+              number: {{ .Values.echo_server.ingress.servicePort }}
+  {{- if .Values.echo_server.ingress.tls }}
   tls:
     - hosts:
-        - {{ .Values.ingress.host }}
-      secretName: {{ .Values.ingress.tls.secretName }}
+        - {{ .Values.echo_server.ingress.host }}
+      secretName: {{ .Values.echo_server.ingress.tls.secretName }}
   {{- end }}
 {{- end }}
