@@ -11,12 +11,9 @@ on:
       - 'app/**'
     types: [closed]  
   workflow_dispatch:
-  
-
 
 env:
   REGISTRY: ghcr.io
-
 
 jobs:
   build-and-push:
@@ -34,20 +31,32 @@ jobs:
         id: changes
         with:
           filters: |
-            echo_server:
-              - 'app/echo_server/**'
+            echo-server:
+              - 'app/echo-server/**'
             frontend:
               - 'app/frontend/**'
 
-      - name: Read Echo Server Version
-        if: steps.changes.outputs.echo_server == 'true'
+      - name: Read and increment Echo Server Version
+        if: steps.changes.outputs.echo-server == 'true'
+        run: |
+          version_path=app/echo-server/version.txt
+          current_version=$(cat "$version_path")
+          IFS='.' read -ra vers <<< "$current_version"
+          new_version="${vers[0]}.${vers[1]}.$((vers[2]+1))"
+          echo "$new_version" > "$version_path"
+          echo "ECHO_VERSION=$new_version" >> $GITHUB_ENV
         id: echo_version
-        run: echo "ECHO_VERSION=$(cat app/echo_server/version.txt)" >> $GITHUB_ENV
 
-      - name: Read Frontend Version
+      - name: Read and increment Frontend Version
         if: steps.changes.outputs.frontend == 'true'
+        run: |
+          version_path=app/frontend/version.txt
+          current_version=$(cat "$version_path")
+          IFS='.' read -ra vers <<< "$current_version"
+          new_version="${vers[0]}.${vers[1]}.$((vers[2]+1))"
+          echo "$new_version" > "$version_path"
+          echo "FRONTEND_VERSION=$new_version" >> $GITHUB_ENV
         id: frontend_version
-        run: echo "FRONTEND_VERSION=$(cat app/frontend/version.txt)" >> $GITHUB_ENV
 
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@v1
@@ -57,11 +66,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Echo Server Docker image
-        if: steps.changes.outputs.echo_server == 'true'
+        if: steps.changes.outputs.echo-server == 'true'
         uses: docker/build-push-action@v5
         with:
-          context: ./app/echo_server
-          file: ./app/echo_server/Dockerfile
+          context: ./app/echo-server
+          file: ./app/echo-server/Dockerfile
           push: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.pull_request.merged == true) }}
           tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/echo-server:${{ env.ECHO_VERSION }}
 
@@ -73,4 +82,3 @@ jobs:
           file: ./app/frontend/Dockerfile
           push: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.pull_request.merged == true) }}
           tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/frontend:${{ env.FRONTEND_VERSION }}
-

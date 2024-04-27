@@ -1,18 +1,44 @@
-name: Publish New Release
+name: New Github Release
 
-on: 
+on:
   workflow_dispatch:
   pull_request:
-    paths:
-      - 'infra/**'
-      - 'app/**'
-    types:
-      - closed
+    types: [closed]
+    branches:
+      - main
+
 jobs:
-  build:
+  version-bump-and-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
-      - name: Release
-        uses: softprops/action-gh-release@v2
+        with:
+          fetch-depth: '0'
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+
+      - name: Install bumpversion
+        run: pip install bumpversion
+
+      - name: Bump version
+        run: bumpversion patch  # Change to 'minor' or 'major' as needed
+
+      - name: Push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git push --tags
+          git push
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.bump_version.outputs.tag }}
+          name: Release ${{ steps.bump_version.outputs.tag }}
+          body: "New release ${{ steps.bump_version.outputs.tag }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
