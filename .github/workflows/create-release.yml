@@ -24,13 +24,16 @@ jobs:
       - name: Install bumpversion
         run: pip install bumpversion
 
+      - name: Configure Git
+        run: |
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --local user.name "${{ github.actor }}"
+
       - name: Bump version
-        run: bumpversion patch  # Change to 'minor' or 'major' as needed
+        run: bumpversion patch
 
       - name: Push changes
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
           git push --tags
           git push
 
