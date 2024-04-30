@@ -45,8 +45,8 @@ jobs:
 
       - name: Push changes
         run: |
-          git push --tags
-          git push
+          git push --tags --force
+          git push --force
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
