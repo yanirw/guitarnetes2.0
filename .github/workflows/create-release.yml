@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: '0'
+          token: ${{ secrets.GITHUB_TOKEN }}  # Ensuring permissions for checkout
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -32,11 +33,15 @@ jobs:
       - name: Bump version and get new tag
         id: bump_version
         run: |
-          VERSION=$(bumpversion patch --list | grep new_version | sed -r s,"^.*=",,)
-          echo "New version: $VERSION"
-          echo "::set-output name=tag::$VERSION"
-          git commit -am "Bump version to $VERSION"
-          git tag $VERSION
+          VERSION=$(bumpversion patch --list | grep 'new_version=' | sed -r 's/^.*=//')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          if git status --porcelain; then
+            git commit -am "Bump version to $VERSION"
+            git tag $VERSION
+            echo "Changes committed and tag created."
+          else
+            echo "No changes to commit."
+          fi
 
       - name: Push changes
         run: |
@@ -46,8 +51,9 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.bump_version.outputs.tag }}
-          name: Release ${{ steps.bump_version.outputs.tag }}
-          body: "New release ${{ steps.bump_version.outputs.tag }}"
+          tag_name: ${{ env.VERSION }}
+          name: Release ${{ env.VERSION }}
+          body: "New release ${{ env.VERSION }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
