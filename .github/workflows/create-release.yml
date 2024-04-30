@@ -33,15 +33,12 @@ jobs:
       - name: Bump version and get new tag
         id: bump_version
         run: |
-          VERSION=$(bumpversion patch --list | grep 'new_version=' | sed -r 's/^.*=//')
+          bumpversion patch --list --allow-dirty
+          VERSION=$(cat app/version.txt)  # Ensure this points to your actual version file path
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          if git status --porcelain; then
-            git commit -am "Bump version to $VERSION"
-            git tag $VERSION
-            echo "Changes committed and tag created."
-          else
-            echo "No changes to commit."
-          fi
+          git add -A
+          git diff-index --quiet HEAD || git commit -am "Bump version to $VERSION"
+          git tag $VERSION
 
       - name: Push changes
         run: |
@@ -56,4 +53,3 @@ jobs:
           body: "New release ${{ env.VERSION }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
