@@ -2,11 +2,16 @@ name: New Github Release
 
 on:
   workflow_dispatch:
+    inputs:
+      version-type:
+        description: 'Type of version increment to apply (major, minor, patch)'
+        required: false
+        default: 'patch'
   pull_request:
     types: [closed]
     branches:
       - main
-      
+
 permissions:
   contents: write
   issues: write
@@ -37,8 +42,8 @@ jobs:
       - name: Bump version and get new tag
         id: bump_version
         run: |
-          bumpversion patch --list --allow-dirty
-          VERSION=$(cat app/version.txt)  # Ensure this points to your actual version file path
+          bumpversion ${{ github.event.inputs.version-type }} --list --allow-dirty
+          VERSION=$(cat app/version.txt)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           git add -A
           git diff-index --quiet HEAD || git commit -am "Bump version to $VERSION"
