@@ -1,4 +1,4 @@
-name: Promote container Image Tags to Production
+name: Env Promotion - dev to prod (Helm)
 
 on:
   workflow_dispatch:
