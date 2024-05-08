@@ -1,4 +1,4 @@
-name: helm_deploy
+name: Helm deploy
 
 on:
   workflow_dispatch:

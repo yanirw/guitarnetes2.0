@@ -1,4 +1,4 @@
-name: build and push images to github package
+name: Build and push images to github package
 
 on:
   push:
