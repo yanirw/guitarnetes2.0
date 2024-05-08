@@ -4,9 +4,16 @@ import requests
 
 app = Flask(__name__)
 
+def get_version():
+    try:
+        with open("version.txt", "r") as file:
+            return file.read().strip()  # Read the version and strip any extraneous whitespace
+    except FileNotFoundError:
+        return "Version not set"
+
 @app.route('/', methods=['GET', 'POST'])
 def show_version():
-    version = os.getenv('DOCKER_IMAGE_VERSION', 'Version not set')
+    version = get_version()  # Use the function to get the version
     echo_response = ""
     if request.method == 'POST':
         message = request.form['message']

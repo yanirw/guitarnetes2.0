@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: microservices-appset
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - cluster: dev-cluster
+                  values: values-dev.yaml
+                  name: dev
+                - cluster: prod-cluster
+                  values: values-prod.yaml
+                  name: prod
+          - git:
+              repoURL: 'https://github.com/yanirw/guitarnetes2.0'
+              revision: HEAD
+              directories:
+                - path: infra/helm/charts/*
+  template:
+    metadata:
+      name: '{{path.basename}}-{{name}}'
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/yanirw/guitarnetes2.0'
+        targetRevision: HEAD
+        path: '{{path}}'
+        helm:
+          valueFiles:
+            - '../../env/{{values}}'
+      destination:
+        server: '{{cluster}}'
+        namespace: 'default'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
