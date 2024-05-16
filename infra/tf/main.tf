@@ -5,7 +5,7 @@ provider "google" {
 
 terraform {
   backend "gcs" {
-    bucket = "guitarnetes-2-tf-backend"
+    bucket = "bucket-gu"
     prefix = "terraform/state"
   }
 }
