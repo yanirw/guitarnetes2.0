@@ -1,7 +1,10 @@
 name: Terraform Apply
 
-on: [issue_comment]
-
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    
 jobs:
   apply:
     if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/terraform apply ') && github.event.comment.user.login == 'yanirw' }}
@@ -30,11 +33,18 @@ jobs:
         run: |
           COMMENT_BODY="${{ github.event.comment.body }}"
           ENVIRONMENT=$(echo $COMMENT_BODY | awk '{print $3}')
-          echo "::set-output name=environment::$ENVIRONMENT"
-          
+          echo "environment=$ENVIRONMENT" >> $GITHUB_ENV
+      
+      - id: init
+        run: terraform init
+        working-directory: infra/tf
+
+      - name: Select Workspace
+        working-directory: infra/tf
+        run: |
+          terraform workspace select ${{ env.environment }}
+      
+  
       - name: terraform apply
-        uses: dflook/terraform-apply@v1
-        with:
-          path: infra/tf
-          auto_approve: true
-          var_file: "env/${{ steps.get-env.outputs.environment }}.tfvars"
+        working-directory: infra/tf
+        run: terraform apply -var-file=env/${{ env.environment }}.tfvars -auto-approve -no-color
