@@ -15,7 +15,7 @@ on:
 permissions:
   contents: write
   issues: write
-      
+
 jobs:
   version-bump-and-release:
     runs-on: ubuntu-latest
@@ -42,12 +42,12 @@ jobs:
       - name: Bump version and get new tag
         id: bump_version
         run: |
-          bumpversion ${{ github.event.inputs.version-type }} --list --allow-dirty
-          VERSION=$(cat app/version.txt)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          NEW_VERSION=$(bumpversion --dry-run --list ${{ github.event.inputs.version-type }} | grep new_version | sed -r s,"^.*=",,)
+          bumpversion ${{ github.event.inputs.version-type }} --new-version $NEW_VERSION --allow-dirty
+          echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
           git add -A
-          git diff-index --quiet HEAD || git commit -am "Bump version to $VERSION"
-          git tag $VERSION
+          git diff-index --quiet HEAD || git commit -am "Bump version to $NEW_VERSION"
+          git tag $NEW_VERSION
 
       - name: Push changes
         run: |
