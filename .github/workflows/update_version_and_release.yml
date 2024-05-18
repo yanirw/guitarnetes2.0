@@ -1,0 +1,93 @@
+name: Bump Version
+
+on:
+  pull_request:
+    branches:
+      - dev
+    types:
+      - closed  
+  workflow_dispatch:
+    inputs:
+      version-type:
+        description: 'Type of version increment to apply (major, minor, patch)'
+        default: 'patch'
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+
+      - name: Bump version
+        id: bump_version  # Adding an ID to refer to this step later
+        run: |
+          set -e  # Exit immediately if a command exits with a non-zero status
+
+          VERSION_FILE="app/version.txt"  # Adjust the path to your version file
+          currentVersion=$(cat $VERSION_FILE)
+
+          # Extract the major, minor, and patch components
+          IFS='.' read -r -a versionArray <<< "$currentVersion"
+          major="${versionArray[0]}"
+          minor="${versionArray[1]}"
+          patch="${versionArray[2]}"
+
+          # Determine which part of the version to increment
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION_TYPE="${{ github.event.inputs.version-type }}"
+          else
+            VERSION_TYPE="patch"
+          fi
+
+          case $VERSION_TYPE in
+            major)
+              major=$((major + 1))
+              minor=0
+              patch=0
+              ;;
+            minor)
+              minor=$((minor + 1))
+              patch=0
+              ;;
+            patch)
+              patch=$((patch + 1))
+              ;;
+          esac
+
+          # Form the new version string
+          newVersion="$major.$minor.$patch"
+
+          # Update the version in the file
+          echo "$newVersion" > $VERSION_FILE
+
+          # Set the new version in the output
+          echo "new_version=$newVersion" >> $GITHUB_ENV
+          echo "::set-output name=new_version::$newVersion"
+
+          # Commit and push changes
+          git add $VERSION_FILE
+          git commit -m "Bump version to $newVersion"
+          
+          # Pull latest changes to ensure no conflicts
+          git pull --rebase origin ${{ github.ref_name }}
+          
+          # Push changes
+          git push origin ${{ github.ref_name }}
+
+      - name: Install GitHub CLI
+        run: sudo apt-get install -y gh
+
+      - name: Create GitHub Release
+        if: ${{ github.event.inputs.version-type == 'minor' || github.event.inputs.version-type == 'major' }}
+        run: |
+          gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
+          gh release create ${{ env.new_version }} --title "Release ${{ env.new_version }}" --notes "## Changes in this release\n\n- Version update to ${{ env.new_version }}"
