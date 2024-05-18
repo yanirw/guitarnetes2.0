@@ -1,4 +1,3 @@
-gcp_project_name = "demo"
 project_id = "logical-acolyte-423107-b5"
 region = "us-east1"
 vpc_name = "demo-vpc-1"
