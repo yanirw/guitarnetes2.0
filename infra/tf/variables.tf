@@ -1,4 +1,3 @@
-variable "gcp_project_name" {}
 variable "project_id" {}
 variable "region" {}
 variable "vpc_name" {}
