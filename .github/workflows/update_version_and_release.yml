@@ -1,9 +1,11 @@
-name: Bump Version
+name: Update version + Create new Release 
 
 on:
-  push:
+  pull_request:
     branches:
-      - dev
+      - main
+    types:
+      - closed  
   workflow_dispatch:
     inputs:
       version-type:
@@ -12,7 +14,7 @@ on:
         default: 'patch'
 
 permissions:
-  contents: write  # Ensure the token has write permissions to the contents
+  contents: write
 
 jobs:
   bump-version:
@@ -30,7 +32,7 @@ jobs:
           git config --global user.name "${{ github.actor }}"
 
       - name: Bump version
-        id: bump_version  # Adding an ID to refer to this step later
+        id: bump_version 
         run: |
           set -e  # Exit immediately if a command exits with a non-zero status
 
@@ -87,11 +89,10 @@ jobs:
           # Push changes
           git push origin ${{ github.ref_name }}
 
-      - name: Install GitHub CLI
-        run: sudo apt-get install -y gh
-
+    
       - name: Create GitHub Release
         if: ${{ github.event.inputs.version-type == 'minor' || github.event.inputs.version-type == 'major' }}
         run: |
+          sudo apt-get install -y gh
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           gh release create ${{ env.new_version }} --title "Release ${{ env.new_version }}" --notes "## Changes in this release\n\n- Version update to ${{ env.new_version }}"
