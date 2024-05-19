@@ -1,16 +1,20 @@
-name: Bump Version
+name: Update version + Create new Release 
 
 on:
   pull_request:
     branches:
-      - dev
+      - main
     types:
       - closed  
   workflow_dispatch:
     inputs:
       version-type:
         description: 'Type of version increment to apply (major, minor, patch)'
+        required: true
         default: 'patch'
+
+permissions:
+  contents: write
 
 jobs:
   bump-version:
@@ -28,7 +32,7 @@ jobs:
           git config --global user.name "${{ github.actor }}"
 
       - name: Bump version
-        id: bump_version  # Adding an ID to refer to this step later
+        id: bump_version 
         run: |
           set -e  # Exit immediately if a command exits with a non-zero status
 
@@ -71,23 +75,24 @@ jobs:
 
           # Set the new version in the output
           echo "new_version=$newVersion" >> $GITHUB_ENV
-          echo "::set-output name=new_version::$newVersion"
 
           # Commit and push changes
           git add $VERSION_FILE
           git commit -m "Bump version to $newVersion"
-          
+
+          # Authenticate using the GITHUB_TOKEN
+          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
           # Pull latest changes to ensure no conflicts
           git pull --rebase origin ${{ github.ref_name }}
-          
+
           # Push changes
           git push origin ${{ github.ref_name }}
 
-      - name: Install GitHub CLI
-        run: sudo apt-get install -y gh
-
+    
       - name: Create GitHub Release
         if: ${{ github.event.inputs.version-type == 'minor' || github.event.inputs.version-type == 'major' }}
         run: |
-          gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
+          sudo apt-get install -y gh
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           gh release create ${{ env.new_version }} --title "Release ${{ env.new_version }}" --notes "## Changes in this release\n\n- Version update to ${{ env.new_version }}"
