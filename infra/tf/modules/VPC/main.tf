@@ -5,11 +5,11 @@ resource "google_compute_network" "my_vpc" {
 }
 
 #cloud router
-resource "google_compute_router" "router" {
-  name    = "router"
-  region  = var.region
-  network = google_compute_network.my_vpc.id
-}
+# resource "google_compute_router" "router" {
+#   name    = "router"
+#   region  = var.region
+#   network = google_compute_network.my_vpc.id
+# }
 
 #nat
 # resource "google_compute_router_nat" "nat" {

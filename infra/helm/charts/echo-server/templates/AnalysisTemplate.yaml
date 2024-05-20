@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
 metadata:
-  name: always-pass-analysis
+  name: always-pass-analysis-echo-server
 spec:
   metrics:
   - name: test-analysis

@@ -20,6 +20,12 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Verify GCP Authentication
+        run: gcloud auth list
+
+      - name: Check IAM Policy
+        run: gcloud projects get-iam-policy logical-acolyte-423107 --flatten="bindings[].members" --format='table(bindings.role)' --filter="bindings.members:serviceAccount:${{ secrets.GCP_SA_EMAIL }}"
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2 
 
@@ -39,7 +45,6 @@ jobs:
         run: |
           terraform workspace select ${{ env.environment }}
       
-  
       - name: terraform apply
         working-directory: infra/tf
         run: terraform apply -var-file=env/${{ env.environment }}.tfvars -auto-approve -no-color
