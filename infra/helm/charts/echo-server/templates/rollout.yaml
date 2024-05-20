@@ -70,7 +70,7 @@ spec:
         - pause: {duration: 1m}
         - analysis:
             templates:
-              - templateName: always-pass-analysis
+              - templateName: always-pass-analysis-echo-server
         - setWeight: 50
         - pause: {duration: 1m}
         - analysis:
