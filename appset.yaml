@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: microservices-appset
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: 'https://github.com/yanirw/guitarnetes2.0'
+        revision: HEAD
+        directories:
+          - path: 'infra/helm/charts/*'
+  template:
+    metadata:
+      name: '{{path.basename}}-dev'
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/yanirw/guitarnetes2.0'
+        targetRevision: HEAD
+        path: '{{path}}'
+        helm:
+          valueFiles:
+            - '../../env/values-dev.yaml'
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: 'default'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: false
+
