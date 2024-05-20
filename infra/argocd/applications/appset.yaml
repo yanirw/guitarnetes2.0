@@ -10,7 +10,7 @@ spec:
           - list:
               elements:
                 - cluster: https://kubernetes.default.svc
-                  values: values-dev.yaml
+                  values: ../../env/values-dev.yaml
                   name: dev
                 # Add future clusters here
                 # - cluster: https://<future-cluster-api>
