@@ -5,25 +5,14 @@ metadata:
   namespace: argocd
 spec:
   generators:
-    - matrix:
-        generators:
-          - list:
-              elements:
-                - cluster: https://kubernetes.default.svc
-                  values: ../../env/values-dev.yaml
-                  name: dev
-                # Add future clusters here
-                # - cluster: https://<future-cluster-api>
-                #   values: values-prod.yaml
-                #   name: prod
-          - git:
-              repoURL: 'https://github.com/yanirw/guitarnetes2.0'
-              revision: HEAD
-              directories:
-                - path: infra/helm/charts/*
+    - git:
+        repoURL: 'https://github.com/yanirw/guitarnetes2.0'
+        revision: HEAD
+        directories:
+          - path: infra/helm/charts/*
   template:
     metadata:
-      name: '{{path.basename}}-{{name}}'
+      name: '{{path.basename}}-dev'
     spec:
       project: default
       source:
@@ -32,9 +21,9 @@ spec:
         path: '{{path}}'
         helm:
           valueFiles:
-            - '../../env/{{values}}'
+            - '../../env/values-dev.yaml'
       destination:
-        server: '{{cluster}}'
+        server: 'https://kubernetes.default.svc'
         namespace: 'default'
       syncPolicy:
         automated:
