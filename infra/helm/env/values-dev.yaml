@@ -51,8 +51,9 @@ echo_server:
 
   ingress:
     enabled: true
+    host: "echo.yanirw.com"
     path: "/echo"
-    servicePort: 80
+    servicePort: 5000
 
 frontend:
   name: frontend
@@ -108,13 +109,12 @@ frontend:
 
   ingress:
     enabled: true
+    host: "frontend.yanirw.com"
     path: "/"
-    servicePort: 80
-
+    servicePort: 3000
 
 global:
   ingress:
-    host: "yanirw.com"
     className: "gce"
     tls:
       enabled: true

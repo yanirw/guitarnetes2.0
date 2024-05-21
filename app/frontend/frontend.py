@@ -17,7 +17,7 @@ def show_version():
     echo_response = ""
     if request.method == 'POST':
         message = request.form['message']
-        response = requests.post('http://echo-server:5000/echo', json={"message": message})
+        response = requests.post('https://echo.yanirw.com/echo', json={"message": message})
         echo_response = response.json()['message']
     return render_template_string("""
         <h1>Docker Image Version: {{version}}</h1>
