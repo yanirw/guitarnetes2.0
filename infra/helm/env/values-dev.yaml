@@ -5,7 +5,7 @@ echo_server:
   image:
     repository: ghcr.io/yanirw/echo-server
     pullPolicy: IfNotPresent
-    tag: "3.0.0"
+    tag: "3.1.2"
 
   imagePullSecrets: []
   nameOverride: ""
