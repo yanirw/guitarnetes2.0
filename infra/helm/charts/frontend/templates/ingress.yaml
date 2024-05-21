@@ -6,24 +6,23 @@ metadata:
   labels:
     {{- include "frontend.labels" . | nindent 4 }}
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: "gce"
 spec:
-  ingressClassName: {{ .Values.frontend.ingress.className }}
   rules:
-  - host: {{ .Values.frontend.ingress.host }}
+  - host: {{ .Values.global.ingress.host }}
     http:
       paths:
-      - path: /
-        pathType: Prefix
+      - path: {{ .Values.frontend.ingress.path }}
+        pathType: ImplementationSpecific
         backend:
           service:
             name: {{ include "frontend.fullname" . }}
             port:
-              number: {{ .Values.frontend.service.port }}
-  {{- if .Values.frontend.ingress.tls.enabled }}
+              number: {{ .Values.frontend.ingress.servicePort }}
+  {{- if .Values.global.ingress.tls.enabled }}
   tls:
   - hosts:
-      - {{ .Values.frontend.ingress.host }}
-    secretName: {{ .Values.frontend.ingress.tls.secretName }}
+      - {{ .Values.global.ingress.host }}
+    secretName: {{ .Values.global.ingress.tls.secretName }}
   {{- end }}
 {{- end }}
