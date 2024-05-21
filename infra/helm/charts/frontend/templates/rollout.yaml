@@ -76,5 +76,5 @@ spec:
         - pause: {duration: 1m}
         - analysis:
             templates:
-              - templateName: always-pass-analysis
+              - templateName: always-pass-analysis-frontend
         - setWeight: 100      
