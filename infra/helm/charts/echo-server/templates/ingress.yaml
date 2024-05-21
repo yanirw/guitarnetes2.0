@@ -2,14 +2,14 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "echo_server.fullname" . }}
+  name: {{ include "echo_server.fullname" . }}-ingress
   labels:
     {{- include "echo_server.labels" . | nindent 4 }}
   annotations:
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
-  - host: {{ .Values.global.ingress.host }}
+  - host: {{ .Values.echo_server.ingress.host }}
     http:
       paths:
       - path: {{ .Values.echo_server.ingress.path }}
@@ -19,10 +19,10 @@ spec:
             name: {{ include "echo_server.fullname" . }}
             port:
               number: {{ .Values.echo_server.ingress.servicePort }}
-  {{- if .Values.global.ingress.tls.enabled }}
+{{- if .Values.global.ingress.tls.enabled }}
   tls:
   - hosts:
-      - {{ .Values.global.ingress.host }}
+      - {{ .Values.echo_server.ingress.host }}
     secretName: {{ .Values.global.ingress.tls.secretName }}
-  {{- end }}
+{{- end }}
 {{- end }}

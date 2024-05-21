@@ -12,7 +12,6 @@ echo_server:
   fullnameOverride: ""
 
   serviceAccount:
-    name: "echo-server-sa"
     create: true
     annotations:
       iam.gke.io/gcp-service-account: k8s-sa@logical-acolyte-423107-b5.iam.gserviceaccount.com
@@ -51,8 +50,9 @@ echo_server:
 
   ingress:
     enabled: true
+    host: "echo.yanirw.com"
     path: "/echo"
-    servicePort: 80
+    servicePort: 5000
 
 frontend:
   name: frontend
@@ -61,14 +61,13 @@ frontend:
   image:
     repository: ghcr.io/yanirw/frontend
     pullPolicy: IfNotPresent
-    tag: "3.0.1"
+    tag: "3.1.2"
 
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
 
   serviceAccount:
-    name: "frontend-sa"
     create: true
     annotations:
       iam.gke.io/gcp-service-account: k8s-sa@logical-acolyte-423107-b5.iam.gserviceaccount.com
@@ -108,13 +107,12 @@ frontend:
 
   ingress:
     enabled: true
+    host: "frontend.yanirw.com"
     path: "/"
-    servicePort: 80
-
+    servicePort: 3000
 
 global:
   ingress:
-    host: "yanirw.com"
     className: "gce"
     tls:
       enabled: true
