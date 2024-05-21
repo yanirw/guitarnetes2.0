@@ -17,7 +17,7 @@ permissions:
   contents: write
 
 jobs:
-  bump-version:
+  upgrade-version:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,8 +31,8 @@ jobs:
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           git config --global user.name "${{ github.actor }}"
 
-      - name: Bump version
-        id: bump_version 
+      - name: Upgrade version
+        id: upgrade_version 
         run: |
           set -e  # Exit immediately if a command exits with a non-zero status
 
@@ -76,20 +76,19 @@ jobs:
           # Set the new version in the output
           echo "new_version=$newVersion" >> $GITHUB_ENV
 
-          # Commit and push changes
+          # Commit the changes
           git add $VERSION_FILE
-          git commit -m "Bump version to $newVersion"
+          git commit -m "Upgrade version to $newVersion"
 
           # Authenticate using the GITHUB_TOKEN
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
           # Pull latest changes to ensure no conflicts
-          git pull --rebase origin ${{ github.ref_name }}
+          git pull --rebase origin main
 
-          # Push changes
-          git push origin ${{ github.ref_name }}
+          # Push the changes to the main branch
+          git push origin main
 
-    
       - name: Create GitHub Release
         if: ${{ github.event.inputs.version-type == 'minor' || github.event.inputs.version-type == 'major' }}
         run: |
