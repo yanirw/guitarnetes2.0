@@ -12,7 +12,6 @@ echo_server:
   fullnameOverride: ""
 
   serviceAccount:
-    name: "echo-server-sa"
     create: true
     annotations:
       iam.gke.io/gcp-service-account: k8s-sa@logical-acolyte-423107-b5.iam.gserviceaccount.com
@@ -69,7 +68,6 @@ frontend:
   fullnameOverride: ""
 
   serviceAccount:
-    name: "frontend-sa"
     create: true
     annotations:
       iam.gke.io/gcp-service-account: k8s-sa@logical-acolyte-423107-b5.iam.gserviceaccount.com
