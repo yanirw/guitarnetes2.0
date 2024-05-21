@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "frontend.labels" . | nindent 4 }}
   annotations:
-    {{- toYaml .Values.frontend.ingress.annotations | nindent 4 }}
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: {{ .Values.frontend.ingress.className }}
   rules:
@@ -20,10 +20,10 @@ spec:
             name: {{ include "frontend.fullname" . }}
             port:
               number: {{ .Values.frontend.service.port }}
-  {{- if .Values.frontend.ingress.tls }}
+  {{- if .Values.frontend.ingress.tls.enabled }}
   tls:
-    - hosts:
-        - {{ .Values.frontend.ingress.host }}
-      secretName: {{ .Values.frontend.ingress.tls.secretName }}
+  - hosts:
+      - {{ .Values.frontend.ingress.host }}
+    secretName: {{ .Values.frontend.ingress.tls.secretName }}
   {{- end }}
 {{- end }}

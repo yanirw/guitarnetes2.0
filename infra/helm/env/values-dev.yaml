@@ -1,6 +1,6 @@
 echo_server:
   name: echo-server
-  replicaCount: 1
+  replicaCount: 3
 
   image:
     repository: ghcr.io/yanirw/echo-server
@@ -50,17 +50,17 @@ echo_server:
 
   ingress:
     enabled: true
-    className: ""  # Specify if needed
-    annotations:
-      # Add specific annotations if required
-    host: "echo-server.local"
-    servicePort: 5000
-    tls: []
+    className: "nginx"
+    host: "echo.yanirw.com"
+    servicePort: 80
+    tls:
+      enabled: true
+      secretName: "cloudflare-tls"
 
 
 frontend:
   name: frontend
-  replicaCount: 1
+  replicaCount: 3
 
   image:
     repository: ghcr.io/yanirw/frontend
@@ -108,14 +108,15 @@ frontend:
   tolerations: []
 
   affinity: {}
+
   ingress:
     enabled: true
-    className: ""  # Specify if needed
-    annotations:
-      # Add specific annotations if required
-    host: "frontend.local"
-    servicePort: 3000
-    tls: []
+    className: "nginx"
+    host: "www.yanirw.com"
+    servicePort: 80
+    tls:
+      enabled: true
+      secretName: "cloudflare-tls"
 
 
 

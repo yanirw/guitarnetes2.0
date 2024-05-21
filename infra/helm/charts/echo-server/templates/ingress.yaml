@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "echo_server.labels" . | nindent 4 }}
   annotations:
-    {{- toYaml .Values.echo_server.ingress.annotations | nindent 4 }}
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: {{ .Values.echo_server.ingress.className }}
   rules:
@@ -20,10 +20,10 @@ spec:
             name: {{ include "echo_server.fullname" . }}
             port:
               number: {{ .Values.echo_server.ingress.servicePort }}
-  {{- if .Values.echo_server.ingress.tls }}
+  {{- if .Values.echo_server.ingress.tls.enabled }}
   tls:
-    - hosts:
-        - {{ .Values.echo_server.ingress.host }}
-      secretName: {{ .Values.echo_server.ingress.tls.secretName }}
+  - hosts:
+      - {{ .Values.echo_server.ingress.host }}
+    secretName: {{ .Values.echo_server.ingress.tls.secretName }}
   {{- end }}
 {{- end }}
