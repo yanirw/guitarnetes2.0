@@ -12,9 +12,10 @@ echo_server:
   fullnameOverride: ""
 
   serviceAccount:
+    name: "echo-server-sa"
     create: true
-    annotations: {}
-    name: ""
+    annotations:
+      iam.gke.io/gcp-service-account: k8s-sa@logical-acolyte-423107-b5.iam.gserviceaccount.com
 
   podAnnotations: {}
 
@@ -67,9 +68,10 @@ frontend:
   fullnameOverride: ""
 
   serviceAccount:
+    name: "frontend-sa"
     create: true
-    annotations: {}
-    name: ""
+    annotations:
+      iam.gke.io/gcp-service-account: k8s-sa@logical-acolyte-423107-b5.iam.gserviceaccount.com
 
   podAnnotations: {}
 
