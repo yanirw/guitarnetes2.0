@@ -51,6 +51,17 @@ spec:
             periodSeconds: 5
           resources:
             {{- toYaml .Values.frontend.resources | nindent 12 }}
+          volumeMounts:
+            - name: tls-certs
+              mountPath: "/etc/ingress-tls"
+              readOnly: true
+      volumes:
+        - name: tls-certs
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "cloudflare-secrets"
       {{- with .Values.frontend.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -63,7 +74,6 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      
   strategy:
     canary:
       steps:
@@ -77,4 +87,4 @@ spec:
         - analysis:
             templates:
               - templateName: always-pass-analysis-frontend
-        - setWeight: 100      
+        - setWeight: 100
