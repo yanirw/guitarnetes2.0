@@ -20,9 +20,9 @@ spec:
             port:
               number: {{ .Values.echo_server.ingress.servicePort }}
 {{- if .Values.global.ingress.tls.enabled }}
-#   tls:
-#   - hosts:
-#       - {{ .Values.echo_server.ingress.host }}
-#     secretName: {{ .Values.global.ingress.tls.secretName }}
-# {{- end }}
-# {{- end }}
+  tls:
+  - hosts:
+      - {{ .Values.echo_server.ingress.host }}
+    secretName: {{ .Values.global.ingress.tls.secretName }}
+{{- end }}
+{{- end }}

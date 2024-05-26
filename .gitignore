@@ -12,3 +12,4 @@ infra/tf/**.terraform
 # Ignore Terraform state files within the .backup directory in the infra/tf directory
 infra/tf/.backup/*.tfstate.*
 **/.DS_Store
+server.*
