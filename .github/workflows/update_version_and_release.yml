@@ -76,20 +76,27 @@ jobs:
           # Set the new version in the output
           echo "new_version=$newVersion" >> $GITHUB_ENV
 
-          # Commit and push changes
+          # Commit the changes
+          git checkout -b version-bump/$newVersion
           git add $VERSION_FILE
           git commit -m "Bump version to $newVersion"
 
           # Authenticate using the GITHUB_TOKEN
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
-          # Pull latest changes to ensure no conflicts
-          git pull --rebase origin ${{ github.ref_name }}
+          # Push the changes to a new branch
+          git push origin version-bump/$newVersion
 
-          # Push changes
-          git push origin ${{ github.ref_name }}
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Bump version to ${{ env.new_version }}
+          branch: version-bump/${{ env.new_version }}
+          title: "Bump version to ${{ env.new_version }}"
+          body: "This PR bumps the version to ${{ env.new_version }}."
+          labels: version-bump
 
-    
       - name: Create GitHub Release
         if: ${{ github.event.inputs.version-type == 'minor' || github.event.inputs.version-type == 'major' }}
         run: |
