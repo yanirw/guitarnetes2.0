@@ -4,13 +4,8 @@ metadata:
   name: argocd-server-ingress
   namespace: argocd
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    kubernetes.io/ingress.class: gce
+    kubernetes.io/ingress.class: "gce"
 spec:
-  tls:
-    - hosts:
-        - argocd.yanirw.com
-      secretName: cloudflare-tls
   rules:
     - host: argocd.yanirw.com
       http:
@@ -22,3 +17,7 @@ spec:
                 name: argocd-server
                 port:
                   number: 443
+  tls:
+    - hosts:
+        - argocd.yanirw.com
+      secretName: cloudflare-tls
