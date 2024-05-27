@@ -11,4 +11,4 @@ spec:
     unhealthyThreshold: 2
     type: HTTP
     requestPath: /healthz
-    port: 8080
+    port: 80
