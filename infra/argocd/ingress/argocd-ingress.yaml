@@ -5,7 +5,6 @@ metadata:
   namespace: argocd
   annotations:
     kubernetes.io/ingress.class: "gce"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"  # Optional: If using cert-manager
 spec:
   rules:
     - host: argocd.yanirw.com
@@ -17,7 +16,7 @@ spec:
               service:
                 name: argocd-server
                 port:
-                  number: 80
+                  number: 8080
   tls:
     - hosts:
         - argocd.yanirw.com
