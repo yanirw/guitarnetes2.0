@@ -9,7 +9,7 @@ spec:
   tls:
     - secretName: cloudflare-tls
   rules:
-    - host: argocd.yanirw.com
+    - host: argo.yanirw.com
       http:
         paths:
         - pathType: Prefix
