@@ -1,14 +1,14 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "frontend.name" -}}
+{{- define "name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
 */}}
-{{- define "frontend.fullname" -}}
+{{- define "fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
 {{- else }}
@@ -21,16 +21,16 @@ Create a default fully qualified app name.
 {{/*
 Define the chart information.
 */}}
-{{- define "frontend.chart" -}}
+{{- define "chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "frontend.labels" -}}
-helm.sh/chart: {{ include "frontend.chart" . }}
-{{ include "frontend.selectorLabels" . }}
+{{- define "labels" -}}
+helm.sh/chart: {{ include "chart" . }}
+{{ include "selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -40,18 +40,18 @@ app.kubernetes.io/managed-by: {{ .Release.Service | lower }}
 {{/*
 Selector labels
 */}}
-{{- define "frontend.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "frontend.name" . }}
+{{- define "selectorLabels" -}}
+app.kubernetes.io/name: {{ include "name" . }}
 app.kubernetes.io/instance: {{ .Release.Name | lower | replace "_" "-" }}
 {{- end }}
 
 {{/*
 Service Account Name
 */}}
-{{- define "frontend.serviceAccountName" -}}
-{{- if .Values.frontend.serviceAccount.create }}
-{{- default (include "frontend.fullname" .) .Values.frontend.serviceAccount.name | replace "_" "-" | lower }}
+{{- define "serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "fullname" .) .Values.serviceAccount.name | replace "_" "-" | lower }}
 {{- else }}
-{{- default "default" .Values.frontend.serviceAccount.name | replace "_" "-" | lower }}
+{{- default "default" .Values.serviceAccount.name | replace "_" "-" | lower }}
 {{- end }}
 {{- end }}
