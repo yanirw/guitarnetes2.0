@@ -28,7 +28,14 @@ jobs:
         for chart in ./infra/helm/charts/*; do
           if [ -d "$chart" ] && [ -e "$chart/Chart.yaml" ]; then
             echo "Linting $(basename $chart)..."
-            helm lint $chart -f ./infra/helm/env/values-dev.yaml
+            # Determine the environment-specific values file path based on the chart name
+            values_file="./infra/helm/charts/$(basename $chart)/env/values-dev.yaml"
+            if [ -e "$values_file" ]; then
+              helm lint $chart -f $values_file
+            else
+              echo "Values file not found for $(basename $chart), using default values"
+              helm lint $chart
+            fi
             if [ $? -ne 0 ]; then
               echo "Error in Helm lint for $(basename $chart)"
               exit 1
@@ -45,7 +52,14 @@ jobs:
           if [ -d "$chart" ] && [ -e "$chart/Chart.yaml" ]; then
             chart_name=$(basename $chart)
             echo "Templating $chart_name..."
-            helm template "$chart_name" $chart -f ./infra/helm/env/values-dev.yaml
+            # Determine the environment-specific values file path based on the chart name
+            values_file="./infra/helm/charts/$chart_name/env/values-dev.yaml"
+            if [ -e "$values_file" ]; then
+              helm template "$chart_name" $chart -f $values_file
+            else
+              echo "Values file not found for $chart_name, using default values"
+              helm template "$chart_name" $chart
+            fi
             if [ $? -ne 0 ]; then
               echo "Error in Helm template for $chart_name"
               exit 1
