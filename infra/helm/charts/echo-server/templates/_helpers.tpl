@@ -51,9 +51,9 @@ app.kubernetes.io/instance: {{ .Release.Name | lower | replace "_" "-" }}
 Create the name of the service account to use
 */}}
 {{- define "echo_server.serviceAccountName" -}}
-{{- if .Values.echo_server.serviceAccount.create }}
-{{- default (include "echo_server.fullname" .) .Values.echo_server.serviceAccount.name | replace "_" "-" | lower }}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "echo_server.fullname" .) .Values.serviceAccount.name | replace "_" "-" | lower }}
 {{- else }}
-{{- default "default" .Values.echo_server.serviceAccount.name | replace "_" "-" | lower }}
+{{- default "default" .Values.serviceAccount.name | replace "_" "-" | lower }}
 {{- end }}
 {{- end }}
