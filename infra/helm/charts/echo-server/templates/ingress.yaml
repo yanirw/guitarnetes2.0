@@ -1,4 +1,4 @@
-{{- if .Values.echo_server.ingress.enabled }}
+{{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9,20 +9,20 @@ metadata:
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
-  - host: {{ .Values.echo_server.ingress.host }}
+  - host: {{ .Values.ingress.host }}
     http:
       paths:
-      - path: {{ .Values.echo_server.ingress.path }}
+      - path: {{ .Values.ingress.path }}
         pathType: ImplementationSpecific
         backend:
           service:
             name: {{ include "echo_server.fullname" . }}
             port:
-              number: {{ .Values.echo_server.ingress.servicePort }}
+              number: {{ .Values.ingress.servicePort }}
 {{- if .Values.global.ingress.tls.enabled }}
   tls:
   - hosts:
-      - {{ .Values.echo_server.ingress.host }}
+      - {{ .Values.ingress.host }}
     secretName: {{ .Values.global.ingress.tls.secretName }}
 {{- end }}
 {{- end }}

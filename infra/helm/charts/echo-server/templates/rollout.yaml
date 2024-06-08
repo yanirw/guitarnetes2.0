@@ -1,41 +1,41 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: {{ .Values.echo_server.name }}
+  name: {{ .Values.name }}
   labels:
     {{- include "echo_server.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.echo_server.autoscaling.enabled }}
-  replicas: {{ .Values.echo_server.replicaCount }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
       {{- include "echo_server.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.echo_server.podAnnotations }}
+      {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "echo_server.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.echo_server.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "echo_server.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.echo_server.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Values.echo_server.name }}
+        - name: {{ .Values.name }}
           securityContext:
-            {{- toYaml .Values.echo_server.securityContext | nindent 12 }}
-          image: "{{ .Values.echo_server.image.repository }}:{{ .Values.echo_server.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.echo_server.image.pullPolicy }}
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.echo_server.service.port }}
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -50,16 +50,16 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
           resources:
-            {{- toYaml .Values.echo_server.resources | nindent 12 }}
-      {{- with .Values.echo_server.nodeSelector }}
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.echo_server.affinity }}
+      {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.echo_server.tolerations }}
+      {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
