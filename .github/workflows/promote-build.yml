@@ -1,0 +1,100 @@
+name: Promote and Build Microservice
+
+on:
+  workflow_call:
+    inputs:
+      service-name:
+        required: true
+        type: string
+      version-type:
+        required: true
+        type: string
+      service-path:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  promote-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+
+      - name: Upgrade version
+        id: upgrade_version 
+        run: |
+          set -e  # Exit immediately if a command exits with a non-zero status
+
+          VERSION_FILE="${{ inputs.service-path }}/version.txt"
+          currentVersion=$(cat $VERSION_FILE)
+
+          # Extract the major, minor, and patch components
+          IFS='.' read -r -a versionArray <<< "$currentVersion"
+          major="${versionArray[0]}"
+          minor="${versionArray[1]}"
+          patch="${versionArray[2]}"
+
+          VERSION_TYPE="${{ inputs.version-type }}"
+
+          case $VERSION_TYPE in
+            major)
+              major=$((major + 1))
+              minor=0
+              patch=0
+              ;;
+            minor)
+              minor=$((minor + 1))
+              patch=0
+              ;;
+            patch)
+              patch=$((patch + 1))
+              ;;
+          esac
+
+          # Form the new version string
+          newVersion="$major.$minor.$patch"
+
+          # Update the version in the file
+          echo "$newVersion" > $VERSION_FILE
+
+          # Set the new version in the output
+          echo "new_version=$newVersion" >> $GITHUB_ENV
+
+          # Commit the changes
+          git add $VERSION_FILE
+          git commit -m "Upgrade version to $newVersion"
+
+          # Authenticate using the GITHUB_TOKEN
+          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+          # Pull latest changes to ensure no conflicts
+          git pull --rebase origin main
+
+          # Push the changes to the main branch
+          git push origin main
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ inputs.service-path }}
+          file: ${{ inputs.service-path }}/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ inputs.service-name }}:${{ env.new_version }}

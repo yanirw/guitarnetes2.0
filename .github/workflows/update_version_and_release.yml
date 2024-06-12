@@ -1,25 +1,72 @@
-name: Update version + Create new Release 
+name: New Release + Promote app + Build images
 
 on:
-  pull_request:
-    branches:
-      - main
-    types:
-      - closed  
   workflow_dispatch:
     inputs:
       version-type:
         description: 'Type of version increment to apply (major, minor, patch)'
         required: true
         default: 'patch'
+      promote-echo-server:
+        description: 'Promote Echo Server?'
+        required: true
+        type: boolean
+      promote-frontend:
+        description: 'Promote Frontend?'
+        required: true
+        type: boolean
 
 permissions:
   contents: write
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
 
 jobs:
-  upgrade-version:
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set up JQ
+        run: sudo apt-get install jq
 
+      - name: Set matrix
+        id: set-matrix
+        run: |
+          services=()
+          paths=()
+          if [ "${{ github.event.inputs.promote-echo-server }}" == "true" ]; then
+            services+=("echo-server")
+            paths+=("app/echo-server")
+          fi
+          if [ "${{ github.event.inputs.promote-frontend }}" == "true" ]; then
+            services+=("frontend")
+            paths+=("app/frontend")
+          fi
+
+          # Create JSON matrix
+          matrix=$(jq -n --argjson services "$(printf '%s\n' "${services[@]}" | jq -R . | jq -s .)" --argjson paths "$(printf '%s\n' "${paths[@]}" | jq -R . | jq -s .)" -c '{ "include": [ { "service_name": $services[], "service_path": $paths[] } ] }')
+          echo "matrix=${matrix}" > matrix.json
+          echo "::set-output name=matrix::$(cat matrix.json)"
+
+  promote-and-build:
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - name: Promote and Build
+        uses: ./.github/workflows/promote-build.yml
+        with:
+          service-name: ${{ matrix.service_name }}
+          version-type: ${{ github.event.inputs.version-type }}
+          service-path: ${{ matrix.service_path }}
+
+  create-release:
+    needs: promote-and-build
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,64 +77,6 @@ jobs:
         run: |
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           git config --global user.name "${{ github.actor }}"
-
-      - name: Upgrade version
-        id: upgrade_version 
-        run: |
-          set -e  # Exit immediately if a command exits with a non-zero status
-
-          VERSION_FILE="app/version.txt"  # Adjust the path to your version file
-          currentVersion=$(cat $VERSION_FILE)
-
-          # Extract the major, minor, and patch components
-          IFS='.' read -r -a versionArray <<< "$currentVersion"
-          major="${versionArray[0]}"
-          minor="${versionArray[1]}"
-          patch="${versionArray[2]}"
-
-          # Determine which part of the version to increment
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            VERSION_TYPE="${{ github.event.inputs.version-type }}"
-          else
-            VERSION_TYPE="patch"
-          fi
-
-          case $VERSION_TYPE in
-            major)
-              major=$((major + 1))
-              minor=0
-              patch=0
-              ;;
-            minor)
-              minor=$((minor + 1))
-              patch=0
-              ;;
-            patch)
-              patch=$((patch + 1))
-              ;;
-          esac
-
-          # Form the new version string
-          newVersion="$major.$minor.$patch"
-
-          # Update the version in the file
-          echo "$newVersion" > $VERSION_FILE
-
-          # Set the new version in the output
-          echo "new_version=$newVersion" >> $GITHUB_ENV
-
-          # Commit the changes
-          git add $VERSION_FILE
-          git commit -m "Upgrade version to $newVersion"
-
-          # Authenticate using the GITHUB_TOKEN
-          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-
-          # Pull latest changes to ensure no conflicts
-          git pull --rebase origin main
-
-          # Push the changes to the main branch
-          git push origin main
 
       - name: Create GitHub Release
         if: ${{ github.event.inputs.version-type == 'minor' || github.event.inputs.version-type == 'major' }}
