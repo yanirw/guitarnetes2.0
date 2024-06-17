@@ -26,25 +26,20 @@ env:
 jobs:
   promote-echo-server:
     if: ${{ github.event.inputs.promote-echo-server }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Promote and Build Echo Server
-        uses: ./.github/workflows/promote-build.yml
-        with:
-          service-name: echo-server
-          version-type: ${{ github.event.inputs.version-type }}
-          service-path: app/echo-server
+    uses: ./.github/workflows/promote-build.yml
+    with:
+      service-name: echo-server
+      version-type: ${{ github.event.inputs.version-type }}
+      service-path: app/echo-server
+
 
   promote-frontend:
     if: ${{ github.event.inputs.promote-frontend }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Promote and Build Frontend
-        uses: ./.github/workflows/promote-build.yml
-        with:
-          service-name: frontend
-          version-type: ${{ github.event.inputs.version-type }}
-          service-path: app/frontend
+    uses: ./.github/workflows/promote-build.yml
+    with:
+      service-name: frontend
+      version-type: ${{ github.event.inputs.version-type }}
+      service-path: app/frontend
 
   create-release:
     needs: [promote-echo-server, promote-frontend]
