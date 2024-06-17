@@ -24,30 +24,28 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  promote-echo-server:
-    if: ${{ github.event.inputs.promote-echo-server }}
+  promote-build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [echo-server, frontend]
     steps:
-      - name: Promote and Build Echo Server
-        uses: ./.github/workflows/promote-build.yml
-        with:
-          service-name: echo-server
-          version-type: ${{ github.event.inputs.version-type }}
-          service-path: app/echo-server
+      - name: Set Promotion Flags
+        id: set-flags
+        run: |
+          echo "PROMOTE_ECHO_SERVER=${{ github.event.inputs.promote-echo-server }}" >> $GITHUB_ENV
+          echo "PROMOTE_FRONTEND=${{ github.event.inputs.promote-frontend }}" >> $GITHUB_ENV
 
-  promote-frontend:
-    if: ${{ github.event.inputs.promote-frontend }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Promote and Build Frontend
+      - name: Promote and Build ${{ matrix.service }}
+        if: ${{ (matrix.service == 'echo-server' && env.PROMOTE_ECHO_SERVER == 'true') || (matrix.service == 'frontend' && env.PROMOTE_FRONTEND == 'true') }}
         uses: ./.github/workflows/promote-build.yml
         with:
-          service-name: frontend
+          service-name: ${{ matrix.service }}
           version-type: ${{ github.event.inputs.version-type }}
-          service-path: app/frontend
+          service-path: app/${{ matrix.service }}
 
   create-release:
-    needs: [promote-echo-server, promote-frontend]
+    needs: [promote-build]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -61,7 +59,6 @@ jobs:
           git config --global user.name "${{ github.actor }}"
 
       - name: Create GitHub Release
-        if: ${{ github.event.inputs.version-type == 'minor' || github.event.inputs.version-type == 'major' }}
         run: |
           sudo apt-get install -y gh
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
