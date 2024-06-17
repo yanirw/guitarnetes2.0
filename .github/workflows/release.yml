@@ -1,4 +1,4 @@
-name: New Release + Promote app + Build images
+name: New Release
 
 on:
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
 
       - name: Promote and Build ${{ matrix.service }}
         if: ${{ (matrix.service == 'echo-server' && env.PROMOTE_ECHO_SERVER == 'true') || (matrix.service == 'frontend' && env.PROMOTE_FRONTEND == 'true') }}
-        uses: ./.github/workflows/promote-build.yml
+        uses: ./.github/workflows/promote-build.yml@main
         with:
           service-name: ${{ matrix.service }}
           version-type: ${{ github.event.inputs.version-type }}
@@ -59,6 +59,7 @@ jobs:
           git config --global user.name "${{ github.actor }}"
 
       - name: Create GitHub Release
+        if: ${{ github.event.inputs.version-type == 'minor' || github.event.inputs.version-type == 'major' }}
         run: |
           sudo apt-get install -y gh
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
