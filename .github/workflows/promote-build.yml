@@ -21,10 +21,10 @@ jobs:
   promote-and-build:
     runs-on: ubuntu-latest
     steps:
-      # - name: Checkout code
-      #   uses: actions/checkout@v4
-      #   with:
-      #     fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Git
         run: |
@@ -37,6 +37,11 @@ jobs:
           set -e  # Exit immediately if a command exits with a non-zero status
 
           VERSION_FILE="${{ inputs.service-path }}/version.txt"
+          if [ ! -f "$VERSION_FILE" ]; then
+            echo "Version file not found: $VERSION_FILE"
+            exit 1
+          fi
+
           currentVersion=$(cat $VERSION_FILE)
 
           # Extract the major, minor, and patch components

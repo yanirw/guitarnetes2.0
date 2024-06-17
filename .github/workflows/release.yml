@@ -1,4 +1,4 @@
-name: New Release + Promote app + Build images
+name: New Release
 
 on:
   workflow_dispatch:
@@ -30,7 +30,7 @@ jobs:
     with:
       service-name: echo-server
       version-type: ${{ github.event.inputs.version-type }}
-      service-path: app/echo-server
+      service-path: ./app/echo-server
 
 
   promote-frontend:
