@@ -80,6 +80,9 @@ jobs:
           git add $VERSION_FILE
           git commit -m "Upgrade version to $newVersion"
 
+          # Pull latest changes to ensure no conflicts
+          git pull --rebase origin HEAD
+
           # Push the changes to the current branch
           git push origin HEAD:${{ github.ref }}
 
