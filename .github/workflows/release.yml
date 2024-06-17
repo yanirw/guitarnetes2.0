@@ -1,4 +1,4 @@
-name: New Release
+name: New Release + Promote app + Build images
 
 on:
   workflow_dispatch:
@@ -30,6 +30,9 @@ jobs:
       matrix:
         service: [echo-server, frontend]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set Promotion Flags
         id: set-flags
         run: |
@@ -38,7 +41,7 @@ jobs:
 
       - name: Promote and Build ${{ matrix.service }}
         if: ${{ (matrix.service == 'echo-server' && env.PROMOTE_ECHO_SERVER == 'true') || (matrix.service == 'frontend' && env.PROMOTE_FRONTEND == 'true') }}
-        uses: ./.github/workflows/promote-build.yml@main
+        uses: ./.github/workflows/promote-build.yml
         with:
           service-name: ${{ matrix.service }}
           version-type: ${{ github.event.inputs.version-type }}
