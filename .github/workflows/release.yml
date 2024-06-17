@@ -24,48 +24,30 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  prepare:
+  promote-echo-server:
+    if: ${{ github.event.inputs.promote-echo-server }}
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - name: Set up JQ
-        run: sudo apt-get install jq
-
-      - name: Set matrix
-        id: set-matrix
-        run: |
-          services=()
-          paths=()
-          if [ "${{ github.event.inputs.promote-echo-server }}" == "true" ]; then
-            services+=("echo-server")
-            paths+=("app/echo-server")
-          fi
-          if [ "${{ github.event.inputs.promote-frontend }}" == "true" ]; then
-            services+=("frontend")
-            paths+=("app/frontend")
-          fi
-
-          # Create JSON matrix
-          matrix=$(jq -n --argjson services "$(printf '%s\n' "${services[@]}" | jq -R . | jq -s .)" --argjson paths "$(printf '%s\n' "${paths[@]}" | jq -R . | jq -s .)" -c '{ "include": [ { "service_name": $services[], "service_path": $paths[] } ] }')
-          echo "matrix=${matrix}" > matrix.json
-          echo "::set-output name=matrix::$(cat matrix.json)"
-
-  promote-and-build:
-    needs: prepare
-    runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
-    steps:
-      - name: Promote and Build
+      - name: Promote and Build Echo Server
         uses: ./.github/workflows/promote-build.yml
         with:
-          service-name: ${{ matrix.service_name }}
+          service-name: echo-server
           version-type: ${{ github.event.inputs.version-type }}
-          service-path: ${{ matrix.service_path }}
+          service-path: app/echo-server
+
+  promote-frontend:
+    if: ${{ github.event.inputs.promote-frontend }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Promote and Build Frontend
+        uses: ./.github/workflows/promote-build.yml
+        with:
+          service-name: frontend
+          version-type: ${{ github.event.inputs.version-type }}
+          service-path: app/frontend
 
   create-release:
-    needs: promote-and-build
+    needs: [promote-echo-server, promote-frontend]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
