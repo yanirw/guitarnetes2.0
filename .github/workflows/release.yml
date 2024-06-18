@@ -34,6 +34,7 @@ jobs:
 
 
   promote-frontend:
+    needs: promote-echo-server
     if: ${{ github.event.inputs.promote-frontend }}
     uses: ./.github/workflows/promote-build.yml
     with:
@@ -115,4 +116,4 @@ jobs:
         if: success()
         run: |
           sudo apt-get install -y gh
-          gh release create $newVersion -t $newVersion --title "Release $newVersion" --notes "## Changes in this release\n\n- Version update to $newVersion" --target $newVersion
+          gh release create $newVersion -t v$newVersion --title "Release $newVersion" --notes "## Changes in this release\n\n- Version update to $newVersion"
