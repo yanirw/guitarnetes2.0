@@ -72,6 +72,8 @@ jobs:
         run: |
           set -e
 
+          current_branch=$(git rev-parse --abbrev-ref HEAD)
+          git pull --rebase origin $current_branch
           # Bump the application version
           VERSION_FILE="./app/version.txt"
           if [ ! -f "$VERSION_FILE" ]; then
