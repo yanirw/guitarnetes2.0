@@ -46,11 +46,13 @@ jobs:
 
   get-new-version:
     runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.upgrade_version.outputs.new_version }}
     steps:
       - name: Upgrade version
         id: upgrade_version 
         run: |
-         echo "new_version=$(cat $VERSION_FILE)" >> $GITHUB_ENV
+          echo "new_version=$(cat $VERSION_FILE)" >> $GITHUB_OUTPUT
 
   promote-echo-server:
     if: ${{ github.event.inputs.promote-echo-server }}
@@ -83,32 +85,37 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Debug - Print version
+        run: echo "Building version - ${{ needs.get-new-version.outputs.new_version }}"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./app/${{ matrix.service }}
           file: ./app/${{ matrix.service }}/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}:${{ env.new_version }}
+          tags: ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}:${{ needs.get-new-version.outputs.new_version }}
+
 
   create-release:
     runs-on: ubuntu-latest
-    needs: [promote-app, promote-echo-server, promote-frontend, build-microservices]
+    needs: [promote-app, promote-echo-server, promote-frontend, build-microservices, get-new-version]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
+  
       - name: Create GitHub Release
+        env:
+          NEW_VERSION: ${{ needs.get-new-version.outputs.new_version }}
         run: |
           sudo apt-get install -y gh
-          newVersion=${{ env.new_version }}
-          release_notes="## Changes in this release\n\n- Version update to $newVersion\n"
+          release_notes="## Changes in this release\n\n- Version update to $NEW_VERSION\n"
           if ${{ github.event.inputs.promote-echo-server }}; then
-            release_notes+="\n- Echo Server promoted to version $newVersion\n"
+            release_notes+="\n- Echo Server promoted to version $NEW_VERSION\n"
           fi
           if ${{ github.event.inputs.promote-frontend }}; then
-            release_notes+="\n- Frontend promoted to version $newVersion\n"
-          fi
-          gh release create v$newVersion -t v$newVersion --title "Release $newVersion" --notes "$release_notes"
+            release_notes+="\n- Frontend promoted to version $NEW_VERSION\n"
+            gh release create v$NEW_VERSION -t v$NEW_VERSION --title "Release $NEW_VERSION" --notes "$release_notes"
+            fi
