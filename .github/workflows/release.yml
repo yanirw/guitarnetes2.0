@@ -108,10 +108,9 @@ jobs:
       - name: Debug - Print build info
         run: echo "Built and pushed ${{ matrix.service }} image with version ${{ steps.version.outputs.VERSION }}"
   
-  
   create-release:
     runs-on: ubuntu-latest
-    needs: [promote-app, promote-echo-server, promote-frontend, build-microservices, get-new-version]
+    needs: [promote-app, promote-echo-server, promote-frontend, get-new-version]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -124,10 +123,15 @@ jobs:
         run: |
           sudo apt-get install -y gh
           release_notes="## Changes in this release\n\n- Version update to $NEW_VERSION\n"
-          if ${{ github.event.inputs.promote-echo-server }}; then
+          if ${{ github.event.inputs.promote-echo-server == 'true' }}; then
             release_notes+="\n- Echo Server promoted to version $NEW_VERSION\n"
           fi
-          if ${{ github.event.inputs.promote-frontend }}; then
+          if ${{ github.event.inputs.promote-frontend == 'true' }}; then
             release_notes+="\n- Frontend promoted to version $NEW_VERSION\n"
-            gh release create v$NEW_VERSION -t v$NEW_VERSION --title "Release $NEW_VERSION" --notes "$release_notes"
-            fi
+          fi
+          if ${{ github.event.inputs.build-microservices == 'true' }}; then
+            release_notes+="\n- Microservices Docker images built and pushed\n"
+          else
+            release_notes+="\n- Microservices Docker images were not built in this release\n"
+          fi
+          gh release create v$NEW_VERSION -t v$NEW_VERSION --title "Release $NEW_VERSION" --notes "$release_notes"
