@@ -52,6 +52,7 @@ jobs:
       - name: Upgrade version
         id: upgrade_version 
         run: |
+          echo "New version is $NEW_VERSION"
           echo "new_version=$(cat $VERSION_FILE)" >> $GITHUB_OUTPUT
 
   promote-echo-server:
@@ -123,4 +124,5 @@ jobs:
         env:
           NEW_VERSION: ${{ needs.get-new-version.outputs.new_version }}
         run: |
+          echo "New version is $NEW_VERSION "
           gh release create v$NEW_VERSION -t v$NEW_VERSION --title "Release $NEW_VERSION"

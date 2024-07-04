@@ -41,6 +41,7 @@ jobs:
             echo "Version file not found: $VERSION_FILE"
             exit 1
           fi
+          echo "current version is $(cat $VERSION_FILE)"
 
           currentVersion=$(cat $VERSION_FILE)
 
@@ -72,6 +73,8 @@ jobs:
 
           # Update the version in the file
           echo "$newVersion" > $VERSION_FILE
+          echo "New version is $newVersion"
+          
 
           # Set the new version in the output
           echo "new_version=$newVersion" >> $GITHUB_ENV
