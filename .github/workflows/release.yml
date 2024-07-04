@@ -29,24 +29,28 @@ env:
   VERSION_FILE: ./app/version.txt
 
 jobs:
-  promote-app:
+  checkout:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+    
+  promote-app:
+      uses: ./.github/workflows/promote.yml
+      with:
+        service-name: app
+        version-type: ${{ github.event.inputs.version-type }}
+        service-path: ./app
 
-      - name: Promote App Version
-        uses: ./.github/workflows/promote.yml
-        with:
-          service-name: app
-          version-type: ${{ github.event.inputs.version-type }}
-          service-path: ./app
-
-      - name: Get New Version
-        id: get_new_version
-        run: echo "new_version=$(cat $VERSION_FILE)" >> $GITHUB_ENV
+  get-new-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upgrade version
+        id: upgrade_version 
+        run: |
+         echo "new_version=$(cat $VERSION_FILE)" >> $GITHUB_ENV
 
   promote-echo-server:
     if: ${{ github.event.inputs.promote-echo-server }}
