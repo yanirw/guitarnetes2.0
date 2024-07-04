@@ -1,4 +1,4 @@
-name: Promote and Build Microservice
+name: Promote Microservice/app
 
 on:
   workflow_call:
@@ -18,7 +18,7 @@ permissions:
   packages: write
 
 jobs:
-  promote-and-build:
+  promote:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -89,17 +89,3 @@ jobs:
           # Push the changes to the current branch
           git push origin $current_branch
 
-      - name: Log into GitHub Packages
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: ${{ inputs.service-path }}
-          file: ${{ inputs.service-path }}/Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ inputs.service-name }}:${{ env.new_version }}
