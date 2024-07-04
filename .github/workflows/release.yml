@@ -1,4 +1,4 @@
-name: New Release + Promote app + Build images
+name: New Release
 
 on:
   workflow_dispatch:
@@ -15,6 +15,10 @@ on:
         description: 'Promote Frontend?'
         required: true
         type: boolean
+      build-microservices:
+        description: 'Build new Docker images?'
+        required: true
+        type: boolean
 
 permissions:
   contents: write
@@ -22,33 +26,10 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
+  VERSION_FILE: ./app/version.txt
 
 jobs:
-  promote-build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service: [echo-server, frontend]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set Promotion Flags
-        id: set-flags
-        run: |
-          echo "PROMOTE_ECHO_SERVER=${{ github.event.inputs.promote-echo-server }}" >> $GITHUB_ENV
-          echo "PROMOTE_FRONTEND=${{ github.event.inputs.promote-frontend }}" >> $GITHUB_ENV
-
-      - name: Promote and Build ${{ matrix.service }}
-        if: ${{ (matrix.service == 'echo-server' && env.PROMOTE_ECHO_SERVER == 'true') || (matrix.service == 'frontend' && env.PROMOTE_FRONTEND == 'true') }}
-        uses: ./.github/workflows/promote-build.yml
-        with:
-          service-name: ${{ matrix.service }}
-          version-type: ${{ github.event.inputs.version-type }}
-          service-path: app/${{ matrix.service }}
-
-  create-release:
-    needs: [promote-build]
+  promote-app:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -56,14 +37,74 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Git
-        run: |
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git config --global user.name "${{ github.actor }}"
+      - name: Promote App Version
+        uses: ./.github/workflows/promote.yml
+        with:
+          service-name: app
+          version-type: ${{ github.event.inputs.version-type }}
+          service-path: ./app
+
+      - name: Get New Version
+        id: get_new_version
+        run: echo "new_version=$(cat $VERSION_FILE)" >> $GITHUB_ENV
+
+  promote-echo-server:
+    if: ${{ github.event.inputs.promote-echo-server }}
+    needs: promote-app
+    uses: ./.github/workflows/promote.yml
+    with:
+      service-name: echo-server
+      version-type: ${{ github.event.inputs.version-type }}
+      service-path: ./app/echo-server
+
+  promote-frontend:
+    if: ${{ github.event.inputs.promote-frontend }}
+    needs: promote-app
+    uses: ./.github/workflows/promote.yml
+    with:
+      service-name: frontend
+      version-type: ${{ github.event.inputs.version-type }}
+      service-path: ./app/frontend
+
+  build-microservices:
+    if: ${{ github.event.inputs.build-microservices }}
+    needs: [promote-echo-server, promote-frontend]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [echo-server, frontend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./app/${{ matrix.service }}
+          file: ./app/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}:${{ env.new_version }}
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [promote-app, promote-echo-server, promote-frontend, build-microservices]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Create GitHub Release
-        if: ${{ github.event.inputs.version-type == 'minor' || github.event.inputs.version-type == 'major' }}
         run: |
           sudo apt-get install -y gh
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-          gh release create ${{ env.new_version }} --title "Release ${{ env.new_version }}" --notes "## Changes in this release\n\n- Version update to ${{ env.new_version }}"
+          newVersion=${{ env.new_version }}
+          release_notes="## Changes in this release\n\n- Version update to $newVersion\n"
+          if ${{ github.event.inputs.promote-echo-server }}; then
+            release_notes+="\n- Echo Server promoted to version $newVersion\n"
+          fi
+          if ${{ github.event.inputs.promote-frontend }}; then
+            release_notes+="\n- Frontend promoted to version $newVersion\n"
+          fi
+          gh release create v$newVersion -t v$newVersion --title "Release $newVersion" --notes "$release_notes"

@@ -1,4 +1,4 @@
-name: Promote and Build Microservice
+name: Promote Microservice/app
 
 on:
   workflow_call:
@@ -18,13 +18,13 @@ permissions:
   packages: write
 
 jobs:
-  promote-and-build:
+  promote:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Fetch all history for proper rebase and push
 
       - name: Set up Git
         run: |
@@ -37,6 +37,11 @@ jobs:
           set -e  # Exit immediately if a command exits with a non-zero status
 
           VERSION_FILE="${{ inputs.service-path }}/version.txt"
+          if [ ! -f "$VERSION_FILE" ]; then
+            echo "Version file not found: $VERSION_FILE"
+            exit 1
+          fi
+
           currentVersion=$(cat $VERSION_FILE)
 
           # Extract the major, minor, and patch components
@@ -75,26 +80,12 @@ jobs:
           git add $VERSION_FILE
           git commit -m "Upgrade version to $newVersion"
 
-          # Authenticate using the GITHUB_TOKEN
-          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-
+          # Get the current branch name
+          current_branch=$(git rev-parse --abbrev-ref HEAD)
+          
           # Pull latest changes to ensure no conflicts
-          git pull --rebase origin main
+          git pull --rebase origin $current_branch
 
-          # Push the changes to the main branch
-          git push origin main
+          # Push the changes to the current branch
+          git push origin $current_branch
 
-      - name: Log into registry ${{ env.REGISTRY }}
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: ${{ inputs.service-path }}
-          file: ${{ inputs.service-path }}/Dockerfile
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ inputs.service-name }}:${{ env.new_version }}
