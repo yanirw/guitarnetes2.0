@@ -123,17 +123,4 @@ jobs:
         env:
           NEW_VERSION: ${{ needs.get-new-version.outputs.new_version }}
         run: |
-          sudo apt-get install -y gh
-          release_notes="## Changes in this release\n\n- Version update to $NEW_VERSION\n"
-          if ${{ github.event.inputs.promote-echo-server == 'true' }}; then
-            release_notes+="\n- Echo Server promoted to version $NEW_VERSION\n"
-          fi
-          if ${{ github.event.inputs.promote-frontend == 'true' }}; then
-            release_notes+="\n- Frontend promoted to version $NEW_VERSION\n"
-          fi
-          if ${{ github.event.inputs.build-microservices == 'true' }}; then
-            release_notes+="\n- Microservices Docker images built and pushed\n"
-          else
-            release_notes+="\n- Microservices Docker images were not built in this release\n"
-          fi
-          gh release create v$NEW_VERSION -t v$NEW_VERSION --title "Release $NEW_VERSION" --notes "$release_notes"
+          gh release create v$NEW_VERSION -t v$NEW_VERSION --title "Release $NEW_VERSION"
