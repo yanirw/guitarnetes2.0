@@ -35,6 +35,9 @@ jobs:
         id: upgrade_version 
         run: |
           set -e  # Exit immediately if a command exits with a non-zero status
+          
+          # Pull latest changes to ensure no conflicts
+          git pull origin $current_branch
 
           VERSION_FILE="${{ inputs.service-path }}/version.txt"
           if [ ! -f "$VERSION_FILE" ]; then
@@ -79,8 +82,6 @@ jobs:
           # Set the new version in the output
           echo "new_version=$newVersion" >> $GITHUB_ENV
 
-          # Pull latest changes to ensure no conflicts
-          git pull --rebase origin $current_branch
 
           # Commit the changes
           git add $VERSION_FILE
