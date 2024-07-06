@@ -47,13 +47,16 @@ jobs:
   get-new-version:
     runs-on: ubuntu-latest
     outputs:
-      new_version: ${{ steps.upgrade_version.outputs.new_version }}
+      new_version: ${{ steps.set_version.outputs.new_version }}
     steps:
-      - name: Upgrade version
-        id: upgrade_version 
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set version
+        id: set_version
         run: |
-          echo "New version is $NEW_VERSION"
-          echo "new_version=$(cat $VERSION_FILE)" >> $GITHUB_OUTPUT
+          VERSION=$(cat ${{ env.VERSION_FILE }})
+          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version set to: $VERSION"
 
   promote-echo-server:
     if: ${{ github.event.inputs.promote-echo-server == 'true' }}
@@ -117,12 +120,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-    
+  
+      - name: Debug - Print version
+        run: echo "New version is ${{ needs.get-new-version.outputs.new_version }}"
+  
       - name: Create GitHub Release
-        env:
-          NEW_VERSION: ${{ needs.get-new-version.outputs.new_version }}
         run: |
-          echo "New version is $NEW_VERSION "
-          gh release create v$NEW_VERSION -t v$NEW_VERSION --title "Release $NEW_VERSION"
+          NEW_VERSION="${{ needs.get-new-version.outputs.new_version }}"
+          if [ -z "$NEW_VERSION" ]; then
+            echo "Error: NEW_VERSION is empty"
+            exit 1
+          fi
+          gh release create "v$NEW_VERSION" \
+            --title "Release $NEW_VERSION" \
+            --notes "Version update to $NEW_VERSION" \
+            --target ${{ github.sha }} \
+            || echo "Release already exists, skipping creation"
