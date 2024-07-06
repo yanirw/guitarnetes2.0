@@ -79,6 +79,9 @@ jobs:
           # Set the new version in the output
           echo "new_version=$newVersion" >> $GITHUB_ENV
 
+          # Pull latest changes to ensure no conflicts
+          git pull --rebase origin $current_branch
+
           # Commit the changes
           git add $VERSION_FILE
           git commit -m "Upgrade version to $newVersion"
@@ -86,8 +89,6 @@ jobs:
           # Get the current branch name
           current_branch=$(git rev-parse --abbrev-ref HEAD)
           
-          # Pull latest changes to ensure no conflicts
-          git pull --rebase origin $current_branch
 
           # Push the changes to the current branch
           git push origin $current_branch
