@@ -35,12 +35,16 @@ jobs:
         id: upgrade_version 
         run: |
           set -e  # Exit immediately if a command exits with a non-zero status
+          
+          # Pull latest changes to ensure no conflicts
+          git pull origin $current_branch
 
           VERSION_FILE="${{ inputs.service-path }}/version.txt"
           if [ ! -f "$VERSION_FILE" ]; then
             echo "Version file not found: $VERSION_FILE"
             exit 1
           fi
+          echo "current version is $(cat $VERSION_FILE)"
 
           currentVersion=$(cat $VERSION_FILE)
 
@@ -72,9 +76,12 @@ jobs:
 
           # Update the version in the file
           echo "$newVersion" > $VERSION_FILE
+          echo "New version is $newVersion"
+          
 
           # Set the new version in the output
           echo "new_version=$newVersion" >> $GITHUB_ENV
+
 
           # Commit the changes
           git add $VERSION_FILE
@@ -83,8 +90,6 @@ jobs:
           # Get the current branch name
           current_branch=$(git rev-parse --abbrev-ref HEAD)
           
-          # Pull latest changes to ensure no conflicts
-          git pull --rebase origin $current_branch
 
           # Push the changes to the current branch
           git push origin $current_branch
