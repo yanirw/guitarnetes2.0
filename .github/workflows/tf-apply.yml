@@ -1,7 +1,8 @@
 name: Terraform Apply
 
 
-on: [issue_comment]
+on: [issue_comment,  workflow_dispatch]
+    
 
 jobs:
   apply:
