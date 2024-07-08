@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: frontend-appset
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      elements:
+      - clusterName: gcp-cluster
+        environment: dev
+        imageTag: latest
+        namespace: default
+        gitRef: HEAD
+  template:
+    metadata:
+      labels:
+        domain: frontend
+      name: frontend-{{environment}}
+    spec:
+      destination:
+        name: '{{clusterName}}'
+        namespace: '{{namespace}}'
+      revisionHistoryLimit: 0
+      source:
+        helm:
+          parameters:
+          - name: image.tag
+            value: '{{imageTag}}'
+          releaseName: frontend
+          valueFiles:
+          - env/values-{{environment}}.yaml
+        path: infra/helm/charts/frontend
+        repoURL: 'https://github.com/yanirw/guitarnetes2.0'
+        targetRevision: '{{gitRef}}'
+      syncPolicy:
+        syncOptions:
+        - CreateNamespace=true
