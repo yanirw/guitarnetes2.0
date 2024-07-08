@@ -6,7 +6,7 @@ on: [issue_comment]
 
 jobs:
   apply:
-    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/terraform apply ') && github.event.comment.user.login == 'yanirw' }}
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/terraform apply') && github.event.comment.user.login == 'yanirw' }}
     runs-on: ubuntu-latest
     name: Apply terraform plan
 

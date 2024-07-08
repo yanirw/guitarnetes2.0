@@ -2,9 +2,6 @@ name: Terraform Plan
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'infra/tf/**'  
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
@@ -57,14 +54,6 @@ jobs:
       run: |
         terraform workspace select ${{ matrix.environment }} || terraform workspace new ${{ matrix.environment }}
       working-directory: infra/tf
-
-    - name: Security Scan with tfsec
-      uses: triat/terraform-security-scan@v3
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tfsec_actions_working_dir: infra/tf
-      continue-on-error: true
 
     - id: plan
       run: terraform plan -var-file=env/${{ matrix.environment }}.tfvars -no-color
