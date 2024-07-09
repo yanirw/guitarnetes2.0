@@ -27,9 +27,6 @@ jobs:
       - name: Verify GCP Authentication
         run: gcloud auth list
 
-      - name: Check IAM Policy
-        run: gcloud projects get-iam-policy logical-acolyte-423107 --flatten="bindings[].members" --format='table(bindings.role)' --filter="bindings.members:serviceAccount:${{ secrets.GCP_SA_EMAIL }}"
-
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2 
 
