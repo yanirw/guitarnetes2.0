@@ -1,4 +1,4 @@
-project_id = "logical-acolyte-423107-b5"
+project_id = "test-policy-423107"
 region = "us-east1"
 vpc_name = "demo-vpc-1"
 subnet_name = "demo-private-subnet"
