@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: echo-server-appset
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      elements:
+      - clusterName: gcp-cluster
+        environment: dev
+        imageTag: latest
+        namespace: default
+        gitRef: HEAD
+  template:
+    metadata:
+      labels:
+        domain: echo-server
+      name: echo-server-{{environment}}
+    spec:
+      destination:
+        name: '{{clusterName}}'
+        namespace: '{{namespace}}'
+      revisionHistoryLimit: 0
+      source:
+        helm:
+          parameters:
+          - name: image.tag
+            value: '{{imageTag}}'
+          releaseName: echo-server
+          valueFiles:
+          - env/values-{{environment}}.yaml
+        path: infra/helm/charts/echo-server
+        repoURL: 'https://github.com/yanirw/guitarnetes2.0'
+        targetRevision: '{{gitRef}}'
+      syncPolicy:
+        syncOptions:
+        - CreateNamespace=true
