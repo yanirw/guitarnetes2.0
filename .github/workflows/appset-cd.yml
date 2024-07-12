@@ -22,7 +22,7 @@ jobs:
             VERSION=$(cat ${MICROSERVICE}/version.txt)
             
             # Update ApplicationSet
-            APPSET_FILE="infra/argocd/${MS_NAME}-appset.yaml"
+            APPSET_FILE="infra/argocd/applications/${MS_NAME}-appset.yaml"
             if [[ -f "$APPSET_FILE" ]]; then
               sed -i "s/imageTag: .*/imageTag: $VERSION/" "$APPSET_FILE"
               git add "$APPSET_FILE"
