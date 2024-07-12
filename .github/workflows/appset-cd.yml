@@ -1,0 +1,38 @@
+name: Update ArgoCD ApplicationSet Image Versions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-image-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Update ApplicationSets
+        run: |
+          MICROSERVICES=$(ls -d app/*/)
+
+          for MICROSERVICE in $MICROSERVICES; do
+            # Extract microservice name
+            MS_NAME=$(basename $MICROSERVICE)
+            
+            # Read version
+            VERSION=$(cat ${MICROSERVICE}/version.txt)
+            
+            # Update ApplicationSet
+            APPSET_FILE="infra/argocd/${MS_NAME}-appset.yaml"
+            if [[ -f "$APPSET_FILE" ]]; then
+              sed -i "s/imageTag: .*/imageTag: $VERSION/" "$APPSET_FILE"
+              git add "$APPSET_FILE"
+            else
+              echo "ApplicationSet file for $MS_NAME not found"
+            fi
+          done
+
+          # Commit and push changes
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git commit -m "Update microservice versions"
+          git push
