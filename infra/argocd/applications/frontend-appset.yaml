@@ -9,7 +9,7 @@ spec:
       elements:
       - clusterName: gcp-cluster
         environment: dev
-        imageTag: 0.0.0
+        imageTag: 3.1.4
         namespace: default
         gitRef: HEAD
   template:
