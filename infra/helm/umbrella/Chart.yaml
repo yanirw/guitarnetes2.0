@@ -1,0 +1,14 @@
+apiVersion: v2
+name: umbrella
+description: A Helm chart for deploying frontend and echo-server
+type: application
+version: 0.1.0
+appVersion: "1.0"
+
+dependencies:
+  - name: frontend
+    version: 0.1.0
+    repository: file://charts/frontend
+  - name: echo-server
+    version: 0.1.0
+    repository: file://charts/echo-server
