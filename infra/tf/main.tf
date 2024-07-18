@@ -3,12 +3,12 @@ provider "google" {
   region  = var.region
 }
 
-terraform {
-  backend "gcs" {
-    bucket = "bucket-gu"
-    prefix = "terraform/state"
-  }
-}
+# terraform {
+#   backend "gcs" {
+#     bucket = "bucket-gu"
+#     prefix = "terraform/state"
+#   }
+# }
 
 module "GKE" {
   source = "./modules/GKE" 
