@@ -11,11 +11,16 @@ spec:
             environment: dev
             namespace: default
             gitRef: HEAD
-            services:
-              - name: frontend
-                imageTag: 3.1.4
-              - name: echo-server
-                imageTag: 3.0.3
+            service: 
+              name: frontend
+              imageTag: 3.1.4
+          - clusterName: gcp-cluster
+            environment: dev
+            namespace: default
+            gitRef: HEAD
+            service:
+              name: echo-server
+              imageTag: 3.0.3
   template:
     metadata:
       name: '{{service.name}}-{{environment}}'
