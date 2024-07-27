@@ -5,43 +5,31 @@ metadata:
   namespace: argocd
 spec:
   generators:
-    - list:
-        elements:
-          - clusterName: gcp-cluster
-            environment: dev
-            namespace: default
-            gitRef: HEAD
-            service: 
-              name: frontend
-              imageTag: 3.1.4
-          - clusterName: gcp-cluster
-            environment: dev
-            namespace: default
-            gitRef: HEAD
-            service:
-              name: echo-server
-              imageTag: 3.0.3
+  - list:
+      elements:
+      - clusterName: gcp-cluster
+        environment: dev
+        namespace: default
+        gitRef: HEAD
   template:
     metadata:
-      name: '{{service.name}}-{{environment}}'
       labels:
-        domain: '{{service.name}}'
+        domain: myapp-umbrella
+      name: myapp-{{environment}}
     spec:
       project: default
       destination:
         name: '{{clusterName}}'
         namespace: '{{namespace}}'
+      revisionHistoryLimit: 0
       source:
+        helm:
+          releaseName: umbrella
+          valueFiles:
+          - env/values-{{environment}}.yaml
+        path: infra/helm/umbrella
         repoURL: 'https://github.com/yanirw/guitarnetes2.0'
         targetRevision: '{{gitRef}}'
-        path: infra/helm/umbrella
-        helm:
-          releaseName: '{{service.name}}'
-          parameters:
-            - name: '{{service.name}}.image.tag'
-              value: '{{service.imageTag}}'
-          valueFiles:
-            - 'charts/{{service.name}}/env/values-{{environment}}.yaml'
       syncPolicy:
         syncOptions:
-          - CreateNamespace=true
+        - CreateNamespace=true
