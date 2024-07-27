@@ -1,57 +1,31 @@
-name: echo-server
-replicaCount: 3
-
-image:
-  repository: ghcr.io/yanirw/echo-server
-  pullPolicy: IfNotPresent
-  tag: "3.0.0"
-
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-
-serviceAccount:
-  create: true
-
-podAnnotations: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-service:
-  type: ClusterIP
-  port: 5000
-
-resources: {}
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 10
-  targetCPUUtilizationPercentage: 60
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
-ingress:
-  enabled: true
-  path: "/echo"
-  servicePort: 5000
-
-global:
+echo_server:
+  name: echo_server
+  replicaCount: 3
+  image:
+    repository: ghcr.io/yanirw/echo-server
+    pullPolicy: IfNotPresent
+    tag: "3.0.0"
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  serviceAccount:
+    create: true
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  service:
+    type: ClusterIP
+    port: 5000
+  resources: {}
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 60
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
   ingress:
-    className: "gce"
-    tls:
-      enabled: true
-      secretName: "cloudflare-tls"
+    enabled: true
+    path: "/echo"
+    servicePort: 5000

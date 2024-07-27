@@ -1,41 +1,41 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: {{ .Values.name }}
+  name: {{ .Values.echo_server.name }}
   labels:
     {{- include "labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  {{- if not .Values.echo_server.autoscaling.enabled }}
+  replicas: {{ .Values.echo_server.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
       {{- include "selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with .Values.echo_server.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.echo_server.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.echo_server.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Values.name }}
+        - name: {{ .Values.echo_server.name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+            {{- toYaml .Values.echo_server.securityContext | nindent 12 }}
+          image: "{{ .Values.echo_server.image.repository }}:{{ .Values.echo_server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.echo_server.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.echo_server.service.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -50,16 +50,16 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
+            {{- toYaml .Values.echo_server.resources | nindent 12 }}
+      {{- with .Values.echo_server.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+      {{- with .Values.echo_server.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- with .Values.echo_server.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

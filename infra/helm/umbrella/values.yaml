@@ -1,0 +1,68 @@
+global:
+  ingress:
+    className: "gce"
+    tls:
+      enabled: true
+      secretName: "cloudflare-tls"
+
+frontend:
+  name: frontend
+  replicaCount: 3
+  image:
+    repository: ghcr.io/yanirw/frontend
+    pullPolicy: IfNotPresent
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  serviceAccount:
+    create: true
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  service:
+    type: ClusterIP
+    port: 3000
+  resources: {}
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 60
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  ingress:
+    enabled: true
+    path: "/"
+    servicePort: 3000
+
+echo_server:
+  name: echo-server
+  replicaCount: 3
+  image:
+    repository: ghcr.io/yanirw/echo-server
+    pullPolicy: IfNotPresent
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  serviceAccount:
+    create: true
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  service:
+    type: ClusterIP
+    port: 5000
+  resources: {}
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 60
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  ingress:
+    enabled: true
+    path: "/echo"
+    servicePort: 5000

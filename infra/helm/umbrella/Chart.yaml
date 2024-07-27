@@ -9,6 +9,6 @@ dependencies:
   - name: frontend
     version: 0.1.0
     repository: file://charts/frontend
-  - name: echo-server
+  - name: echo_server
     version: 0.1.0
     repository: file://charts/echo-server
