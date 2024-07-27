@@ -1,4 +1,4 @@
-name: Helm ci
+name: Helm CI
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
       - 'infra/helm/**'
 
 jobs:
-  helm_template:
+  helm_check:
     name: Helm Check
     runs-on: ubuntu-latest
 
@@ -23,49 +23,19 @@ jobs:
       with:
         version: 'latest'
 
-    - name: Lint Helm Charts
+    - name: Lint and Template Helm Charts
       run: |
-        for chart in ./infra/helm/charts/*; do
-          if [ -d "$chart" ] && [ -e "$chart/Chart.yaml" ]; then
-            echo "Linting $(basename $chart)..."
-            # Determine the environment-specific values file path based on the chart name
-            values_file="./infra/helm/charts/$(basename $chart)/env/values-dev.yaml"
-            if [ -e "$values_file" ]; then
-              helm lint $chart -f $values_file
-            else
-              echo "Values file not found for $(basename $chart), using default values"
-              helm lint $chart
-            fi
-            if [ $? -ne 0 ]; then
-              echo "Error in Helm lint for $(basename $chart)"
-              exit 1
-            fi
-          else
-            echo "Skipping $(basename $chart), not a chart directory or Chart.yaml missing"
-          fi
+        cd ./infra/helm/umbrella
+        
+        for values_file in env/values-*.yaml; do
+          env=$(basename $values_file .yaml | sed 's/values-//')
+          echo "Processing environment: $env"
+          
+          echo "Linting chart for $env..."
+          helm lint . -f $values_file
+          
+          echo "Templating chart for $env..."
+          helm template test . -f $values_file
         done
-        echo "Linting completed successfully"
 
-    - name: Template Helm Charts
-      run: |
-        for chart in ./infra/helm/charts/*; do
-          if [ -d "$chart" ] && [ -e "$chart/Chart.yaml" ]; then
-            chart_name=$(basename $chart)
-            echo "Templating $chart_name..."
-            # Determine the environment-specific values file path based on the chart name
-            values_file="./infra/helm/charts/$chart_name/env/values-dev.yaml"
-            if [ -e "$values_file" ]; then
-              helm template "$chart_name" $chart -f $values_file
-            else
-              echo "Values file not found for $chart_name, using default values"
-              helm template "$chart_name" $chart
-            fi
-            if [ $? -ne 0 ]; then
-              echo "Error in Helm template for $chart_name"
-              exit 1
-            fi
-          else
-            echo "Skipping $(basename $chart), not a chart directory or Chart.yaml missing"
-          fi
-        done
-        echo "Templating completed successfully"
+        echo "All Helm checks completed"

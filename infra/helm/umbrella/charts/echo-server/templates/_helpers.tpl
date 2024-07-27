@@ -2,24 +2,26 @@
 Expand the name of the chart.
 */}}
 {{- define "name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
+{{- default .Chart.Name .Values.echo_server.nameOverride | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If the release name contains the chart name it will be used as a full name.
 */}}
 {{- define "fullname" -}}
-{{- if .Values.fullnameOverride }}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
+{{- if .Values.echo_server.fullnameOverride }}
+{{- .Values.echo_server.fullnameOverride | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
 {{- else }}
-{{- $name := default .Chart.Name .Values.nameOverride }}
+{{- $name := default .Chart.Name .Values.echo_server.nameOverride }}
 {{- $name = printf "%s-%s" .Release.Name $name | replace "_" "-" | lower }}
 {{- $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 {{- end }}
 
 {{/*
-Define the chart information.
+Create chart name and version as used by the chart label.
 */}}
 {{- define "chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
@@ -46,12 +48,12 @@ app.kubernetes.io/instance: {{ .Release.Name | lower | replace "_" "-" }}
 {{- end }}
 
 {{/*
-Service Account Name
+Create the name of the service account to use
 */}}
 {{- define "serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "fullname" .) .Values.serviceAccount.name | replace "_" "-" | lower }}
+{{- if .Values.echo_server.serviceAccount.create }}
+{{- default (include "fullname" .) .Values.echo_server.serviceAccount.name | replace "_" "-" | lower }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name | replace "_" "-" | lower }}
+{{- default "default" .Values.echo_server.serviceAccount.name | replace "_" "-" | lower }}
 {{- end }}
 {{- end }}
