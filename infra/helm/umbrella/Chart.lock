@@ -2,8 +2,8 @@ dependencies:
 - name: frontend
   repository: file://charts/frontend
   version: 0.1.0
-- name: echo-server
+- name: echo_server
   repository: file://charts/echo-server
   version: 0.1.0
-digest: sha256:c39553904bdd3de35f322891e0ba6dfb58e1fa449156c4778324a35e3aea22ae
-generated: "2024-07-27T15:16:56.118061+03:00"
+digest: sha256:15024eebe922d67b91145aa6133e328514993f0ad9572f1dc8460928b26eae6c
+generated: "2024-07-27T23:32:24.607964+03:00"

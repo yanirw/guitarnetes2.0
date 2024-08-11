@@ -2,7 +2,7 @@
 Expand the name of the chart.
 */}}
 {{- define "name" -}}
-{{- default .Chart.Name .Values.echo_server.nameOverride | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
 {{- end }}
 
 {{/*
@@ -11,10 +11,10 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If the release name contains the chart name it will be used as a full name.
 */}}
 {{- define "fullname" -}}
-{{- if .Values.echo_server.fullnameOverride }}
-{{- .Values.echo_server.fullnameOverride | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" | lower | replace "_" "-" }}
 {{- else }}
-{{- $name := default .Chart.Name .Values.echo_server.nameOverride }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
 {{- $name = printf "%s-%s" .Release.Name $name | replace "_" "-" | lower }}
 {{- $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
@@ -51,9 +51,9 @@ app.kubernetes.io/instance: {{ .Release.Name | lower | replace "_" "-" }}
 Create the name of the service account to use
 */}}
 {{- define "serviceAccountName" -}}
-{{- if .Values.echo_server.serviceAccount.create }}
-{{- default (include "fullname" .) .Values.echo_server.serviceAccount.name | replace "_" "-" | lower }}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "fullname" .) .Values.serviceAccount.name | replace "_" "-" | lower }}
 {{- else }}
-{{- default "default" .Values.echo_server.serviceAccount.name | replace "_" "-" | lower }}
+{{- default "default" .Values.serviceAccount.name | replace "_" "-" | lower }}
 {{- end }}
 {{- end }}
