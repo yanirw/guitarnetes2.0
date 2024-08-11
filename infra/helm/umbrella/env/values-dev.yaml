@@ -1,6 +1,6 @@
 frontend:
   image:
-    tag: "3.1.1"
+    tag: "3.1.4"
   serviceAccount:
     annotations:
       iam.gke.io/gcp-service-account: k8s-sa@logical-acolyte-423107-b5.iam.gserviceaccount.com
@@ -9,7 +9,7 @@ frontend:
 
 echo_server:
   image:
-    tag: "3.0.1"
+    tag: "3.0.3"
   serviceAccount:
     annotations:
       iam.gke.io/gcp-service-account: k8s-sa@logical-acolyte-423107-b5.iam.gserviceaccount.com
