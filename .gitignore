@@ -13,3 +13,6 @@ infra/tf/**.terraform
 infra/tf/.backup/*.tfstate.*
 **/.DS_Store
 server.*
+app/frontend/node_modules
+./app/frontend/build
+app/frontend/node_modules/*
