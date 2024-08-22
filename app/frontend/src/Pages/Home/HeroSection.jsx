@@ -10,9 +10,7 @@ export default function HeroSection() {
             Engineer
           </h1>
           <p className="hero--section-description">
-            I bring expertise in designing and maintaining robust infrastructure solutions.
-            <br /> My work revolves around leveraging cutting-edge technologies to optimize workflows,
-            ensuring reliable and scalable deployments.
+            I bring expertise in designing, building and maintaining robust infrastructure solutions.
           </p>
         </div>
         <div className="hero--section-buttons">

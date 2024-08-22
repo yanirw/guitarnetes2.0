@@ -9,15 +9,9 @@ export default function AboutMe() {
           <p className="section--title">About</p>
           <h1 className="skills-section--heading">About Me</h1>
           <p className="hero--section-description">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem
-            officiis sit debitis omnis harum sed veniam quasi dicta accusamus
-            recusandae? Voluptatem, reprehenderit alias? Eligendi aperiam
-            tempora numquam sint odit optio.
-          </p>
+          As a Cloud and DevOps enthusiast, I’m committed to upholding best practices and maintaining high technical standards. With an adaptable approach, I continually strive to enhance my skills and deliver reliable, efficient solutions.  </p>
           <p className="hero--section-description">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem
-            officiis sit debitis omnis harum sed veniam quasi dicta accusamus
-            recusandae?
+          My passion for optimizing infrastructure and automating workflows drives me to explore new technologies and methodologies.
           </p>
         </div>
       </div>

@@ -20,7 +20,6 @@ p {
   --primary: #5e3bee;
   --heading-color: #282938;
   --bg-shade: #f5fcff;
-  --github: #e62872;
   --darkblue: #1c1e53;
   --black: #000000;
   --white: #ffffff;
@@ -67,8 +66,10 @@ p {
 }
 .btn-github {
   color: var(--white);
-  background-color: var(--github);
-  border: var(--github);
+  background-color: var(--black);
+  color: var(--primary);
+  background-color: var(--white);
+  border: var(--primary);
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -76,9 +77,15 @@ p {
   box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.95);
   gap: 16px;
 }
+
+
 .btn-github:hover {
-  color: var(--github);
-  background-color: var(--white);
+  color: var(--white);
+  background-color: var(--black);
+}
+
+.portfolio--container-box a {
+  text-decoration: none;
 }
 /* Global CSS Ends */
 /* Main Headings */
