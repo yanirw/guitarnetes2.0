@@ -15,6 +15,7 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 5000
+  metricsPort: 8080 
 resources: {}
 autoscaling:
   enabled: false
