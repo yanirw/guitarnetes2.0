@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: monitoring
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      elements:
+      - name: grafana
+        path: infra/helm/monitoring/grafana
+      - name: prometheus
+        path: infra/helm/monitoring/prometheus
+  template:
+    metadata:
+      name: '{{name}}'
+    spec:
+      project: monitoring
+      source:
+        repoURL: 'https://github.com/yanirw/guitarnetes2.0'
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: monitoring
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
