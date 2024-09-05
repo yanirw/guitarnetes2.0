@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 from prometheus_flask_exporter import PrometheusMetrics
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from prometheus_client import make_wsgi_app
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
@@ -18,5 +20,12 @@ def echo():
 def health():
     return jsonify({"status": "healthy"})
 
+# Expose metrics on /metrics
+app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+    '/metrics': make_wsgi_app()
+})
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    # Run the app on port 5000
+    from werkzeug.serving import run_simple
+    run_simple('0.0.0.0', 5000, app)
