@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
 from prometheus_flask_exporter import PrometheusMetrics
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from prometheus_client import make_wsgi_app
+from werkzeug.serving import run_simple
+import threading
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
@@ -20,12 +21,18 @@ def echo():
 def health():
     return jsonify({"status": "healthy"})
 
-# Expose metrics on /metrics
-app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
-    '/metrics': make_wsgi_app()
+# Create a dispatcher to serve the app and metrics on different ports
+app_dispatcher = DispatcherMiddleware(app, {
+    '/metrics': metrics.registry.make_wsgi_app()
 })
 
+def run_metrics_server():
+    run_simple('0.0.0.0', 8080, app_dispatcher)
+
 if __name__ == '__main__':
-    # Run the app on port 5000
-    from werkzeug.serving import run_simple
-    run_simple('0.0.0.0', 5000, app)
+    # Start the metrics server in a separate thread
+    metrics_thread = threading.Thread(target=run_metrics_server)
+    metrics_thread.start()
+    
+    # Run the main app on port 5000
+    app.run(host='0.0.0.0', port=5000)
