@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'infra/helm/**'  
+      - 'infra/app-charts/**'  
   pull_request:
     paths:
-      - 'infra/helm/**'
+      - 'infra/app-charts/**'
 
 jobs:
   helm_check:
@@ -25,7 +25,7 @@ jobs:
 
     - name: Lint and Template Helm Charts
       run: |
-        cd ./infra/helm/umbrella
+        cd ./infra/app-charts
         
         for values_file in env/values-*.yaml; do
           env=$(basename $values_file .yaml | sed 's/values-//')
