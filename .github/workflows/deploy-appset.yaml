@@ -33,7 +33,7 @@ jobs:
         uses: google-github-actions/get-gke-credentials@v1
         with:
           cluster_name: ${{ secrets.DEV_GKE_CLUSTER }}
-          location: ${{ secrets.DEV_GKE_ZONE }}
+          location: ${{ vars.DEV_GKE_ZONE }}
 
       - name: Deploy ApplicationSet
         run: |
