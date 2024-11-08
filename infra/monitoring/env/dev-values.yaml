@@ -1,0 +1,87 @@
+prometheus:
+  scrape_configs:
+        - job_name: prometheus
+          static_configs:
+            - targets:
+                - localhost:9090
+        - job_name: "echo-server"
+          kubernetes_sd_configs:
+            - role: endpoints
+          relabel_configs:
+            - source_labels: [__meta_kubernetes_service_name]
+              regex: umbrella-echo-server
+              action: keep
+            - source_labels: [__meta_kubernetes_endpoint_port_name]
+              regex: metrics
+              action: keep
+
+grafana:
+  enabled: true
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://monitoring-prometheus-server.monitoring.svc.cluster.local
+          access: proxy
+          isDefault: true
+          jsonData:
+            timeInterval: 30s
+            queryTimeout: "60s"
+  grafana:
+  dashboards:
+    default:
+      echo-server-dashboard:
+        json: |
+          {
+            "annotations": {
+              "list": []
+            },
+            "editable": true,
+            "panels": [
+              {
+                "title": "Request Rate",
+                "type": "graph",
+                "datasource": "Prometheus",
+                "targets": [
+                  {
+                    "expr": "rate(http_requests_total{job=\"echo-server\"}[5m])",
+                    "legendFormat": "{{method}} {{path}}"
+                  }
+                ]
+              },
+              {
+                "title": "Response Status Codes",
+                "type": "graph",
+                "datasource": "Prometheus",
+                "targets": [
+                  {
+                    "expr": "rate(http_requests_total{job=\"echo-server\"}[5m])",
+                    "legendFormat": "{{status}}"
+                  }
+                ]
+              },
+              {
+                "title": "Response Time (seconds)",
+                "type": "graph",
+                "datasource": "Prometheus",
+                "targets": [
+                  {
+                    "expr": "rate(http_request_duration_seconds_sum{job=\"echo-server\"}[5m]) / rate(http_request_duration_seconds_count{job=\"echo-server\"}[5m])",
+                    "legendFormat": "avg"
+                  }
+                ]
+              }
+            ],
+            "refresh": "10s",
+            "schemaVersion": 26,
+            "style": "dark",
+            "time": {
+              "from": "now-1h",
+              "to": "now"
+            },
+            "title": "Echo Server Metrics",
+            "uid": "echo-server",
+            "version": 1
+          }

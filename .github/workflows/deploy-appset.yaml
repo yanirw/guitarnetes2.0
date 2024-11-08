@@ -1,0 +1,50 @@
+name: Deploy ArgoCD ApplicationSet
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+    paths:
+      - 'infra/argocd/monitoring/**'
+      - 'infra/monitoring/**'
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+  pull-requests: write
+          
+jobs:
+  deploy-dev:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Configure GCP credentials
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: ${{ vars.DEV_GKE_CLUSTER_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ secrets.DEV_GKE_CLUSTER }}
+          location: ${{ vars.DEV_GKE_ZONE }}
+
+      - name: Deploy ApplicationSet
+        run: |
+          kubectl apply -f infra/argocd/applications/umbrella-appset.yaml
+
+      - name: Verify ApplicationSet deployment
+        run: |
+          kubectl wait --for=condition=established --timeout=60s \
+            applicationset/umbrella-appset -n argocd
