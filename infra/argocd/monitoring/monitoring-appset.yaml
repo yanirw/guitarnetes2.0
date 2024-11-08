@@ -26,7 +26,7 @@
           helm:
             releaseName: monitoring
             valueFiles:
-            - env/values-{{environment}}.yaml
+            - env/{{environment}}-values.yaml
           path: infra/monitoring
           repoURL: 'https://github.com/yanirw/guitarnetes2.0'
           targetRevision: '{{gitRef}}'
