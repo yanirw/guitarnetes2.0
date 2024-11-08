@@ -1,5 +1,4 @@
-name: Deploy Monitoring ApplicationSet
-
+name: Deploy ArgoCD ApplicationSet
 on:
   workflow_dispatch:
   pull_request:
@@ -36,31 +35,11 @@ jobs:
           cluster_name: ${{ secrets.DEV_GKE_CLUSTER }}
           location: ${{ secrets.DEV_GKE_ZONE }}
 
-      - name: Deploy ApplicationSet to Dev
+      - name: Deploy ApplicationSet
         run: |
-          kubectl apply -f infra/argocd/monitoring/monitoring-appset.yaml
+          kubectl apply -f infra/argocd/applications/umbrella-appset.yaml
 
       - name: Verify ApplicationSet deployment
         run: |
-          kubectl get applicationset -n argocd monitoring-appset
-
-      - name: Comment PR
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: 'Deployment to dev cluster completed successfully.'
-            })
-
-  deploy-prod:
-    if: github.event.issue.pull_request && github.event.comment.body == '/deploy-prod'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout PR
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          kubectl wait --for=condition=established --timeout=60s \
+            applicationset/umbrella-appset -n argocd
