@@ -23,142 +23,65 @@ grafana:
       datasources:
         - name: Prometheus
           type: prometheus
-          url: http://{{ .Release.Name }}-prometheus-server.{{ .Release.Namespace }}.svc.cluster.local
+          url: http://monitoring-prometheus-server.monitoring.svc.cluster.local
           access: proxy
           isDefault: true
+          jsonData:
+            timeInterval: 30s
+            queryTimeout: "60s"
+  grafana:
   dashboards:
     default:
       echo-server-dashboard:
         json: |
           {
             "annotations": {
-              "list": [
-                {
-                  "builtIn": 1,
-                  "datasource": "-- Grafana --",
-                  "enable": true,
-                  "hide": true,
-                  "iconColor": "rgba(0, 211, 255, 1)",
-                  "name": "Annotations & Alerts",
-                  "type": "dashboard"
-                }
-              ]
+              "list": []
             },
             "editable": true,
-            "gnetId": null,
-            "graphTooltip": 0,
-            "id": null,
-            "links": [],
             "panels": [
               {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": null,
-                "fieldConfig": {
-                  "defaults": {
-                    "custom": {}
-                  },
-                  "overrides": []
-                },
-                "fill": 1,
-                "fillGradient": 0,
-                "gridPos": {
-                  "h": 9,
-                  "w": 12,
-                  "x": 0,
-                  "y": 0
-                },
-                "hiddenSeries": false,
-                "id": 2,
-                "legend": {
-                  "avg": false,
-                  "current": false,
-                  "max": false,
-                  "min": false,
-                  "show": true,
-                  "total": false,
-                  "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "nullPointMode": "null",
-                "options": {
-                  "alertThreshold": true
-                },
-                "percentage": false,
-                "pluginVersion": "7.2.0",
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
+                "title": "Request Rate",
+                "type": "graph",
+                "datasource": "Prometheus",
                 "targets": [
                   {
                     "expr": "rate(http_requests_total{job=\"echo-server\"}[5m])",
-                    "interval": "",
-                    "legendFormat": "",
-                    "refId": "A"
+                    "legendFormat": "{{method}} {{path}}"
                   }
-                ],
-                "thresholds": [],
-                "timeFrom": null,
-                "timeRegions": [],
-                "timeShift": null,
-                "title": "Echo Server Request Rate",
-                "tooltip": {
-                  "shared": true,
-                  "sort": 0,
-                  "value_type": "individual"
-                },
+                ]
+              },
+              {
+                "title": "Response Status Codes",
                 "type": "graph",
-                "xaxis": {
-                  "buckets": null,
-                  "mode": "time",
-                  "name": null,
-                  "show": true,
-                  "values": []
-                },
-                "yaxes": [
+                "datasource": "Prometheus",
+                "targets": [
                   {
-                    "format": "short",
-                    "label": null,
-                    "logBase": 1,
-                    "max": null,
-                    "min": null,
-                    "show": true
-                  },
-                  {
-                    "format": "short",
-                    "label": null,
-                    "logBase": 1,
-                    "max": null,
-                    "min": null,
-                    "show": true
+                    "expr": "rate(http_requests_total{job=\"echo-server\"}[5m])",
+                    "legendFormat": "{{status}}"
                   }
-                ],
-                "yaxis": {
-                  "align": false,
-                  "alignLevel": null
-                }
+                ]
+              },
+              {
+                "title": "Response Time (seconds)",
+                "type": "graph",
+                "datasource": "Prometheus",
+                "targets": [
+                  {
+                    "expr": "rate(http_request_duration_seconds_sum{job=\"echo-server\"}[5m]) / rate(http_request_duration_seconds_count{job=\"echo-server\"}[5m])",
+                    "legendFormat": "avg"
+                  }
+                ]
               }
             ],
+            "refresh": "10s",
             "schemaVersion": 26,
             "style": "dark",
-            "tags": [],
-            "templating": {
-              "list": []
-            },
             "time": {
-              "from": "now-6h",
+              "from": "now-1h",
               "to": "now"
             },
-            "timepicker": {},
-            "timezone": "",
-            "title": "Echo Server Dashboard",
+            "title": "Echo Server Metrics",
             "uid": "echo-server",
             "version": 1
           }
