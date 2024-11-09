@@ -1,0 +1,35 @@
+{
+  "properties": {
+    "global":                {"properties": {"platform": {"enum": ["", "openshift"]}}},
+    "clusterEvents":         {"properties": {"destinations": { "uniqueItems": true, "items": { "type": "string" }}}},
+    "clusterMetrics":        {"properties": {"destinations": { "uniqueItems": true, "items": { "type": "string" }}}},
+    "podLogs":               {"properties": {"destinations": { "uniqueItems": true, "items": { "type": "string" }}}},
+
+    "destinations": {"$ref": "#/definitions/destination-list"},
+    "alloy-metrics": {"properties":  {"remoteConfig": {"properties": {
+      "auth": {"properties": {"type":  {"enum": ["none", "basic", "bearerToken"]}}}
+    }}}}
+  },
+  "definitions": {
+    "loki-destination": {"properties": {
+      "auth": {"properties": {"type": {"enum": ["none", "basic", "bearerToken"]}}},
+      "secret": {"properties": {"create": {"type": ["null", "boolean"]}}},
+      "tenantId": {"type": ["string", "number"]}
+    }},
+    "otlp-destination": {"properties": {
+      "auth": {"properties": {"type": {"enum": ["none", "basic", "bearerToken"]}}},
+      "secret": {"properties": {"create": {"type": ["null", "boolean"]}}},
+      "tenantId": {"type": ["string", "number"]}
+    }},
+    "prometheus-destination": {"properties": {
+      "auth": {"properties": {"type": {"enum": ["none", "basic", "bearerToken", "sigv4"]}}},
+      "secret": {"properties": {"create": {"type": ["null", "boolean"]}}},
+      "tenantId": {"type": ["string", "number"]}
+    }},
+    "pyroscope-destination": {"properties": {
+      "auth": {"properties": {"type": {"enum": ["none", "basic", "bearerToken"]}}},
+      "secret": {"properties": {"create": {"type": ["null", "boolean"]}}},
+      "tenantId": {"type": ["string", "number"]}
+    }}
+  }
+}
