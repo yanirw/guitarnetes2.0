@@ -1,0 +1,42 @@
+dependencies:
+- name: k8s-monitoring-feature-annotation-autodiscovery
+  repository: file://../feature-annotation-autodiscovery
+  version: 1.0.0
+- name: k8s-monitoring-feature-application-observability
+  repository: file://../feature-application-observability
+  version: 1.0.0
+- name: k8s-monitoring-feature-cluster-events
+  repository: file://../feature-cluster-events
+  version: 1.0.0
+- name: k8s-monitoring-feature-cluster-metrics
+  repository: file://../feature-cluster-metrics
+  version: 1.0.0
+- name: k8s-monitoring-feature-integrations
+  repository: file://../feature-integrations
+  version: 1.0.0
+- name: k8s-monitoring-feature-pod-logs
+  repository: file://../feature-pod-logs
+  version: 1.0.0
+- name: k8s-monitoring-feature-profiling
+  repository: file://../feature-profiling
+  version: 1.0.0
+- name: k8s-monitoring-feature-prometheus-operator-objects
+  repository: file://../feature-prometheus-operator-objects
+  version: 1.0.0
+- name: alloy
+  repository: https://grafana.github.io/helm-charts
+  version: 0.9.2
+- name: alloy
+  repository: https://grafana.github.io/helm-charts
+  version: 0.9.2
+- name: alloy
+  repository: https://grafana.github.io/helm-charts
+  version: 0.9.2
+- name: alloy
+  repository: https://grafana.github.io/helm-charts
+  version: 0.9.2
+- name: alloy
+  repository: https://grafana.github.io/helm-charts
+  version: 0.9.2
+digest: sha256:f5738b270a715d0fd122f5db19a928aceb4470a21314366cd91b8535fbcdbbee
+generated: "2024-11-08T08:16:51.073548-06:00"

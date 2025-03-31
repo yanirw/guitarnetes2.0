@@ -30,3 +30,6 @@ dependencies:
   - name: grafana
     version: "*"
     repository: "file://charts/grafana"
+  - name: k8s-monitoring
+    version: "*"
+    repository: "file://charts/k8s-monitoring"
