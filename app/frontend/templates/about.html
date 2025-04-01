@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}About Me - Yanir Winnik{% endblock %}
+{% block nav_about %}active{% endblock %}
+
+{% block content %}
+<section class="about-me">
+    <div class="about-header">
+        <div class="profile-image">
+            <!-- Placeholder for profile image -->
+            <div class="image-placeholder">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+        <div class="about-intro">
+            <h1>{{ config.AUTHOR }}</h1>
+            <h2>{{ config.POSITION }}</h2>
+            <div class="contact-links">
+                <a href="mailto:{{ config.EMAIL }}" class="contact-link">
+                    <i class="fas fa-envelope"></i> {{ config.EMAIL }}
+                </a>
+                <a href="{{ config.GITHUB_URL }}" target="_blank" class="contact-link">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+                <a href="/download-cv" class="contact-link">
+                    <i class="fas fa-file-pdf"></i> Download CV
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="about-content">
+        <div class="about-text">
+            <h2>About Me</h2>
+            <p>{{ config.ABOUT_TEXT|safe }}</p>
+        </div>
+        
+        <div class="projects-section">
+            <h2>Featured Project: Guitarnetes 2.0</h2>
+            <div class="project-card">
+                <h3>Kubernetes Microservices Demo</h3>
+                <p>This project demonstrates my DevOps skills through a practical implementation of microservices
+                architecture deployed on Kubernetes. It features complete CI/CD pipelines and ArgoCD for GitOps workflow.</p>
+                <div class="project-features">
+                    <div class="feature">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Microservices Architecture</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-code-branch"></i>
+                        <span>CI/CD Pipeline</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-dharmachakra"></i>
+                        <span>Kubernetes Deployment</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>GitOps with ArgoCD</span>
+                    </div>
+                </div>
+                <a href="{{ config.PROJECT_REPO }}" target="_blank" class="btn primary">View Project</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="skills-section">
+        <h2>Technical Skills</h2>
+        <div class="skills-grid">
+            <div class="skill-category">
+                <h3>Cloud & Infrastructure</h3>
+                <ul class="skill-list">
+                    <li>Kubernetes</li>
+                    <li>Docker</li>
+                    <li>AWS/GCP/Azure</li>
+                    <li>Terraform</li>
+                    <li>Infrastructure as Code</li>
+                </ul>
+            </div>
+            <div class="skill-category">
+                <h3>CI/CD & Automation</h3>
+                <ul class="skill-list">
+                    <li>GitOps</li>
+                    <li>Jenkins</li>
+                    <li>GitHub Actions</li>
+                    <li>ArgoCD</li>
+                    <li>Continuous Deployment</li>
+                </ul>
+            </div>
+            <div class="skill-category">
+                <h3>Monitoring & Security</h3>
+                <ul class="skill-list">
+                    <li>Prometheus</li>
+                    <li>Grafana</li>
+                    <li>ELK Stack</li>
+                    <li>Security Scanning</li>
+                    <li>Compliance Automation</li>
+                </ul>
+            </div>
+            <div class="skill-category">
+                <h3>Development</h3>
+                <ul class="skill-list">
+                    <li>Python</li>
+                    <li>Bash/Shell</li>
+                    <li>YAML/JSON</li>
+                    <li>Web Technologies</li>
+                    <li>Microservices Design</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

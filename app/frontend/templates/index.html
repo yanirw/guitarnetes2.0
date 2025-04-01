@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Guitarnetes 2.0 - K8s Microservices Demo{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>{{ config.PROJECT_NAME }}</h1>
+        <p class="subtitle">A Kubernetes Microservices Project</p>
+        <div class="hero-buttons">
+            <a href="#project-details" class="btn primary">Learn More</a>
+            <a href="{{ config.PROJECT_REPO }}" target="_blank" class="btn secondary">View on GitHub</a>
+        </div>
+    </div>
+</section>
+
+<section id="project-details" class="project-details">
+    <h2>Project Overview</h2>
+    <p>{{ config.PROJECT_DESCRIPTION }}</p>
+    
+    <div class="architecture">
+        <h3>Microservices Architecture</h3>
+        <div class="architecture-diagram">
+            <div class="service frontend">
+                <i class="fas fa-desktop"></i>
+                <h4>Frontend Service</h4>
+                <p>Flask-based UI serving this web interface</p>
+            </div>
+            <div class="arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="service backend">
+                <i class="fas fa-server"></i>
+                <h4>Echo Server</h4>
+                <p>Separate microservice that responds to requests</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="echo-demo">
+    <h2>Try the Echo Microservice</h2>
+    <p>This form demonstrates communication between the frontend service and the echo server microservice. The message you enter is sent to a separate backend service and the response is displayed below.</p>
+    
+    <div class="echo-container">
+        <form id="echo-form" class="echo-form">
+            <div class="form-group">
+                <label for="message">Message:</label>
+                <input type="text" id="message" name="message" placeholder="Enter a message to send to the echo service">
+            </div>
+            <button type="submit" class="btn primary">Send to Echo Server</button>
+        </form>
+        
+        <div class="response-container">
+            <h3>Echo Server Response:</h3>
+            <div id="response" class="response-box">
+                <p class="empty-response">Response will appear here...</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="tech-stack">
+    <h2>Technology Stack</h2>
+    <div class="tech-grid">
+        <div class="tech-item">
+            <i class="fab fa-docker"></i>
+            <h3>Docker</h3>
+            <p>Containerized applications</p>
+        </div>
+        <div class="tech-item">
+            <i class="fas fa-dharmachakra"></i>
+            <h3>Kubernetes</h3>
+            <p>Container orchestration</p>
+        </div>
+        <div class="tech-item">
+            <i class="fab fa-python"></i>
+            <h3>Python</h3>
+            <p>Flask-based microservices</p>
+        </div>
+        <div class="tech-item">
+            <i class="fas fa-code-branch"></i>
+            <h3>CI/CD</h3>
+            <p>Automated deployment</p>
+        </div>
+        <div class="tech-item">
+            <i class="fas fa-sync-alt"></i>
+            <h3>ArgoCD</h3>
+            <p>GitOps workflow</p>
+        </div>
+        <div class="tech-item">
+            <i class="fas fa-chart-line"></i>
+            <h3>Prometheus</h3>
+            <p>Monitoring & metrics</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('echo-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const message = document.getElementById('message').value;
+    const responseElement = document.getElementById('response');
+    
+    // Show loading indicator
+    responseElement.innerHTML = '<p class="loading">Sending request to echo server...</p>';
+    
+    fetch('/echo', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `message=${encodeURIComponent(message)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            responseElement.innerHTML = `<p class="success">${data.message}</p>`;
+        } else {
+            responseElement.innerHTML = `<p class="error">Error: ${data.message}</p>`;
+        }
+    })
+    .catch(error => {
+        responseElement.innerHTML = `<p class="error">Connection error: ${error.message}</p>`;
+    });
+});
+</script>
+{% endblock %}
