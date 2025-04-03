@@ -2,68 +2,49 @@ import React from 'react';
 import { Box, Container, Typography, Paper } from '@mui/material';
 import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot } from '@mui/lab';
 import { motion } from 'framer-motion';
-import { Work as WorkIcon } from '@mui/icons-material';
+import { Article as ArticleIcon } from '@mui/icons-material';
 
-const experiences = [
+const articles = [
   {
-    title: 'Senior DevOps Engineer',
-    company: 'Tech Company A',
-    period: '2021 - Present',
-    description: 'Led the migration of legacy infrastructure to Kubernetes, resulting in 40% cost reduction and improved scalability. Implemented GitOps practices and automated CI/CD pipelines.',
-  },
-  {
-    title: 'Cloud Infrastructure Engineer',
-    company: 'Tech Company B',
-    period: '2019 - 2021',
-    description: 'Designed and maintained multi-cloud infrastructure using Terraform. Implemented monitoring solutions with Prometheus and Grafana.',
-  },
-  {
-    title: 'DevOps Engineer',
-    company: 'Tech Company C',
-    period: '2017 - 2019',
-    description: 'Automated deployment processes using Jenkins and Docker. Managed AWS infrastructure and implemented security best practices.',
-  },
+    title: 'GCP Workload Identity Federation: From Concept to Implementation',
+    publishedAt: 'Feb 2024',
+    description: 'A comprehensive guide on implementing GCP Workload Identity Federation, covering the concept, benefits, and step-by-step implementation process for secure cloud authentication.',
+    link: 'https://medium.com/@hbhr932/gcp-workload-identity-federation-from-concept-to-implementation-2f4d90551e13'
+  }
 ];
 
-const Experience = () => {
+const Articles = () => {
   return (
     <Box
-      id="experience"
+      id="articles"
       sx={{
         py: 12,
-        background: 'linear-gradient(135deg, #4B0082 0%, #FF6B6B 50%, #4CAF50 100%)',
         position: 'relative',
-        overflow: 'hidden',
       }}
     >
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          opacity: 0.1,
-          background: 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%)',
-        }}
-      />
       <Container maxWidth="lg">
-        <Box
-          sx={{
-            backgroundColor: 'rgba(13, 17, 23, 0.95)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: 2,
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 0 40px rgba(0, 0, 0, 0.5)',
-            p: 6,
-            mx: 2,
+        <motion.div
+          initial={{ scale: 0.95 }}
+          whileInView={{ scale: 1 }}
+          transition={{ 
+            duration: 0.6,
+            ease: [0.4, 0, 0.2, 1]
           }}
+          viewport={{ once: false, amount: 0.2 }}
         >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
+          <Box
+            sx={{
+              backgroundColor: 'rgba(13, 17, 23, 0.95)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: 2,
+              p: 6,
+              mx: 2,
+              transformOrigin: 'center',
+              '&:hover': {
+                transform: 'scale(1.01)',
+                transition: 'transform 0.3s ease-in-out',
+              },
+            }}
           >
             <Typography 
               variant="h2" 
@@ -77,11 +58,11 @@ const Experience = () => {
                 mb: 8,
               }}
             >
-              Professional Experience
+              Articles
             </Typography>
 
             <Timeline position="alternate">
-              {experiences.map((experience, index) => (
+              {articles.map((article, index) => (
                 <TimelineItem key={index}>
                   <TimelineSeparator>
                     <TimelineDot 
@@ -90,9 +71,9 @@ const Experience = () => {
                         boxShadow: '0 0 10px rgba(255, 255, 255, 0.1)',
                       }}
                     >
-                      <WorkIcon sx={{ color: '#FFFFFF' }} />
+                      <ArticleIcon sx={{ color: '#FFFFFF' }} />
                     </TimelineDot>
-                    {index !== experiences.length - 1 && (
+                    {index !== articles.length - 1 && (
                       <TimelineConnector sx={{ bgcolor: 'rgba(255, 255, 255, 0.1)' }} />
                     )}
                   </TimelineSeparator>
@@ -116,8 +97,10 @@ const Experience = () => {
                             backgroundColor: 'rgba(22, 27, 34, 0.9)',
                             transform: 'translateY(-4px)',
                             transition: 'all 0.3s ease-in-out',
+                            cursor: 'pointer',
                           },
                         }}
+                        onClick={() => window.open(article.link, '_blank')}
                       >
                         <Typography 
                           variant="h6"
@@ -127,7 +110,7 @@ const Experience = () => {
                             fontWeight: 500,
                           }}
                         >
-                          {experience.title}
+                          {article.title}
                         </Typography>
                         <Typography 
                           variant="subtitle1"
@@ -137,18 +120,7 @@ const Experience = () => {
                             mb: 1,
                           }}
                         >
-                          {experience.company}
-                        </Typography>
-                        <Typography 
-                          variant="caption"
-                          sx={{
-                            color: 'rgba(255, 255, 255, 0.7)',
-                            fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-                            display: 'block',
-                            mb: 2,
-                          }}
-                        >
-                          {experience.period}
+                          {article.publishedAt}
                         </Typography>
                         <Typography 
                           variant="body2"
@@ -158,7 +130,7 @@ const Experience = () => {
                             lineHeight: 1.6,
                           }}
                         >
-                          {experience.description}
+                          {article.description}
                         </Typography>
                       </Paper>
                     </motion.div>
@@ -166,11 +138,11 @@ const Experience = () => {
                 </TimelineItem>
               ))}
             </Timeline>
-          </motion.div>
-        </Box>
+          </Box>
+        </motion.div>
       </Container>
     </Box>
   );
 };
 
-export default Experience; 
+export default Articles;

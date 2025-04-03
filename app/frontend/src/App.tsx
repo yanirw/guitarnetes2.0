@@ -3,8 +3,8 @@ import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
-import Experience from './components/Experience';
 import Skills from './components/Skills';
+import Articles from './components/Articles';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
@@ -116,8 +116,8 @@ function App() {
           }}
         >
           <About />
-          <Experience />
           <Skills />
+          <Articles />
           <Projects />
           <Contact />
         </Box>
