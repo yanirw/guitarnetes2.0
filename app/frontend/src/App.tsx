@@ -1,5 +1,5 @@
 import React from 'react';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -98,14 +98,29 @@ function App() {
       <CssBaseline />
       <div>
         <Navbar />
-        <main>
-          <Hero />
+        <Hero />
+        <Box
+          component="main"
+          sx={{
+            background: 'linear-gradient(135deg, #4B0082 0%, #FF6B6B 50%, #4CAF50 100%)',
+            '& > *': {
+              background: 'none',
+              boxShadow: 'none',
+              border: 'none',
+            },
+            '& > * > *': {
+              background: 'none',
+              boxShadow: 'none',
+              border: 'none',
+            }
+          }}
+        >
           <About />
           <Experience />
           <Skills />
           <Projects />
           <Contact />
-        </main>
+        </Box>
         <Footer />
       </div>
     </ThemeProvider>

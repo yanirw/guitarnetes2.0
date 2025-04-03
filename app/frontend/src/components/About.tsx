@@ -9,30 +9,15 @@ const About = () => {
       id="about"
       sx={{
         py: 12,
-        background: 'linear-gradient(135deg, #4B0082 0%, #FF6B6B 50%, #4CAF50 100%)',
         position: 'relative',
-        overflow: 'hidden',
       }}
     >
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          opacity: 0.1,
-          background: 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%)',
-        }}
-      />
       <Container maxWidth="lg">
         <Box
           sx={{
             backgroundColor: 'rgba(13, 17, 23, 0.95)',
             backdropFilter: 'blur(20px)',
             borderRadius: 2,
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 0 40px rgba(0, 0, 0, 0.5)',
             p: 6,
             mx: 2,
           }}
@@ -86,7 +71,6 @@ const About = () => {
                       p: 4,
                       height: '100%',
                       textAlign: 'center',
-                      borderRadius: 2,
                       backgroundColor: 'rgba(22, 27, 34, 0.7)',
                       backdropFilter: 'blur(10px)',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -137,7 +121,6 @@ const About = () => {
                       p: 4,
                       height: '100%',
                       textAlign: 'center',
-                      borderRadius: 2,
                       backgroundColor: 'rgba(22, 27, 34, 0.7)',
                       backdropFilter: 'blur(10px)',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -188,7 +171,6 @@ const About = () => {
                       p: 4,
                       height: '100%',
                       textAlign: 'center',
-                      borderRadius: 2,
                       backgroundColor: 'rgba(22, 27, 34, 0.7)',
                       backdropFilter: 'blur(10px)',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
