@@ -103,13 +103,15 @@ function App() {
           component="main"
           sx={{
             background: 'linear-gradient(135deg, #4B0082 0%, #FF6B6B 50%, #4CAF50 100%)',
+            backgroundAttachment: 'fixed',
+            minHeight: '100vh',
             '& > *': {
-              background: 'none',
+              background: 'transparent',
               boxShadow: 'none',
               border: 'none',
             },
             '& > * > *': {
-              background: 'none',
+              background: 'transparent',
               boxShadow: 'none',
               border: 'none',
             }
