@@ -8,6 +8,7 @@ import Articles from './components/Articles';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import Expertise from './components/Expertise';
 
 const theme = createTheme({
   palette: {
@@ -99,6 +100,7 @@ function App() {
       <div>
         <Navbar />
         <Hero />
+        <Expertise />
         <Box
           component="main"
           sx={{
