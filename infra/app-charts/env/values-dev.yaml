@@ -5,7 +5,7 @@ frontend:
     annotations:
       iam.gke.io/gcp-service-account: k8s-sa@logical-acolyte-423107-b5.iam.gserviceaccount.com
   ingress:
-    host: "frontend.yanirw.com"
+    host: "yanirw.com"
 
 echo_server:
   image:

@@ -9,7 +9,7 @@ spec:
       elements:
       - clusterName: gcp-cluster
         environment: dev
-        namespace: default
+        namespace: dev-app
         gitRef: HEAD
   template:
     metadata:
