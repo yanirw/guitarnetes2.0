@@ -10,7 +10,7 @@ const Hero = () => {
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
-        background: 'linear-gradient(135deg, #4B0082 0%, #FF6B6B 50%, #1a472a 100%)',
+        background: 'linear-gradient(135deg, #4B0082 0%, #FF6B6B 50%, rgb(96, 203, 169) 100%)',
         position: 'relative',
         overflow: 'hidden',
       }}

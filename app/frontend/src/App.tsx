@@ -5,7 +5,6 @@ import Hero from './components/Hero';
 import About from './components/About';
 import Skills from './components/Skills';
 import Articles from './components/Articles';
-import Projects from './components/Projects';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Expertise from './components/Expertise';
@@ -105,7 +104,7 @@ function App() {
           sx={{
             position: 'relative',
             minHeight: '100vh',
-            background: 'linear-gradient(135deg, #4B0082 0%, #FF6B6B 50%, #4CAF50 100%)',
+            background: 'linear-gradient(135deg, #4B0082 0%, #FF6B6B 50%, rgb(96, 203, 169) 100%)',
             backgroundAttachment: 'fixed',
             backgroundSize: 'cover',
             '&::before': {
@@ -141,7 +140,6 @@ function App() {
             <About />
             <Skills />
             <Articles />
-            <Projects />
             <Contact />
           </Box>
         </Box>
