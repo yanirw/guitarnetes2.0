@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@types/react-router-dom": "^5.3.3",
+    "@types/react-scroll": "^1.8.10",
+    "particles.js": "^2.0.0",
+    "react-router-dom": "^7.4.1",
+    "react-scroll": "^1.9.3"
+  }
+}
