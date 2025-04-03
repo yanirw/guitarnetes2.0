@@ -1,17 +1,18 @@
-FROM python:3.9-slim
+# Build stage
+FROM node:18-alpine as build
 
 WORKDIR /app
+COPY package*.json ./
+RUN npm install
 
-# Install dependencies first (better caching)
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
 COPY . .
+RUN npm run build
 
-# Create directory for static files if it doesn't exist
-RUN mkdir -p static
+# Production stage
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=build /app/public/*.pdf /usr/share/nginx/html/
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 3000
-
-CMD ["python", "app.py"]
+CMD ["nginx", "-g", "daemon off;"]
