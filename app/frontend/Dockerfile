@@ -1,38 +1,39 @@
-# Build stage
+# Stage 1: Build the React application
 FROM node:18-alpine as build
 
+# Set working directory
 WORKDIR /app
 
-# Copy package files first to leverage Docker cache
-COPY package*.json ./
-RUN npm ci --only=production
+# Copy package files
+COPY package.json package-lock.json ./
 
+# Install dependencies and add react-scroll
+RUN npm ci && npm install react-scroll @types/react-scroll
+
+# Copy the rest of the application code
 COPY . .
+
+# Build the application
 RUN npm run build
 
-# Production stage
+# Stage 2: Serve the application using nginx
 FROM nginx:alpine
 
-# Create non-root user
-RUN addgroup -g 1001 -S nginx && \
-    adduser -S -D -H -u 1001 -h /usr/share/nginx/html -s /sbin/nologin -G nginx -g nginx nginx && \
-    chown -R nginx:nginx /usr/share/nginx/html && \
-    chown -R nginx:nginx /var/cache/nginx && \
-    chown -R nginx:nginx /var/log/nginx && \
-    chown -R nginx:nginx /etc/nginx/conf.d && \
-    touch /var/run/nginx.pid && \
-    chown -R nginx:nginx /var/run/nginx.pid
-
-USER nginx
-
+# Copy the build output from stage 1
 COPY --from=build /app/build /usr/share/nginx/html
-COPY --from=build /app/public/*.pdf /usr/share/nginx/html/
-COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Create custom nginx config to listen on port 3000
+RUN echo 'server { \
+    listen 3000; \
+    location / { \
+        root /usr/share/nginx/html; \
+        index index.html index.htm; \
+        try_files $uri $uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
+
+# Expose port 3000
 EXPOSE 3000
 
-# Add healthcheck
-HEALTHCHECK --interval=30s --timeout=3s \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
-
+# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
